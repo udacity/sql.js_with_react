@@ -7,7 +7,7 @@ class SQLText extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      code: "-- Enter your SQL below:\n--SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary DESC;\n",
+      code: "-- Enter your SQL below, for instance:\n-- SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;\n",
       handleUserSql : this.props.handleUserSql
     }
     this.updateCode = this.updateCode.bind(this);

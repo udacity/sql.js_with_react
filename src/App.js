@@ -12,7 +12,7 @@ class App extends Component {
     super(props);
     this.SQL = window.SQL; // extremely hacky but not sure how else to get to sqljs object
     this.state = {
-      userSql: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary DESC'
+      userSql: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;'
     }
     this.handleUserSql = this.handleUserSql.bind(this);
   }

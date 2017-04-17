@@ -1,4 +1,4 @@
-//import * as SQL from 'sqljs';
+import * as SQL from 'sql.js';
 //import SQL from 'sqljs';
 import React, { Component } from 'react';
 
@@ -6,7 +6,7 @@ class SQLOutput extends Component {
 
   constructor(props) {
     super(props);
-    this.db = new this.props.SQL.Database();
+    this.db = new SQL.Database();
 
     // Set up a simple database
     this.db.run("CREATE TABLE employees (id integer, name varchar(50), salary float);");

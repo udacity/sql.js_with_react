@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import Button from './Button';
 import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import logo from './udacity_logo.png';
@@ -10,7 +9,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.SQL = window.SQL; // extremely hacky but not sure how else to get to sqljs object
+    //this.SQL = window.SQL; // extremely hacky but not sure how else to get to sqljs object
     this.state = {
       userSql: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;'
     }
@@ -33,7 +32,7 @@ class App extends Component {
       <p className="App-intro"></p>
       <SQLText handleUserSql={this.handleUserSql}/>
       <div className="SqlOutput">
-        <SQLOutput SQL={this.SQL} userSql={this.state.userSql} />
+        <SQLOutput userSql={this.state.userSql} />
       </div>
       </div>
     );

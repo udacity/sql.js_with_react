@@ -12,6 +12,7 @@ class SQLText extends Component {
       saveUserQueryForEvaluator: props.saveUserQueryForEvaluator,
       smallDb: props.smallDb
     }
+    this.runQueryImmediately = false;
     this.updateSqlText = this.updateSqlText.bind(this);
     console.log('SQLText, smallDb:', this.state.smallDb);
   }
@@ -22,18 +23,20 @@ class SQLText extends Component {
     }
   }
 
-  updateSqlText (currentQuery, runNow ) {
+  updateSqlText (currentQuery) {
     console.log('updateSqlText with currentQuery:', currentQuery);
     this.setState( {sqlText: currentQuery} );
-    if (this.state.smallDb || runNow) {
+    if (this.state.smallDb || this.runQueryImmediately) {
+      console.log('runNow:', currentQuery, this.state.smallDb);
       this.state.handleUserQuery(currentQuery);
+      this.runQueryImmediately = false;
     } else {
       this.state.saveUserQueryForEvaluator(currentQuery);
     }
   }
 
   render() {
-    var callUpdate = function(currentQuery) { this.updateSqlText(currentQuery, true); };
+    var callUpdate = function(currentQuery) { this.runQueryImmediately = true; this.updateSqlText(currentQuery); };
     callUpdate = callUpdate.bind(this);
     var options = {
       lineNumbers: true,

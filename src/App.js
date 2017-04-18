@@ -44,7 +44,7 @@ class App extends Component {
   }
 
   saveUserQueryForEvaluator(newUserQuery) {
-    console.log('Saving query for later:', newUserQuery);
+    //console.log('Saving query for later:', newUserQuery);
     this.setState({newUserQuery:newUserQuery});
   }
 

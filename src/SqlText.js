@@ -42,8 +42,8 @@ class SQLText extends Component {
       lineNumbers: true,
       extraKeys: {
         'Ctrl-Enter': function(cm) { callUpdate(cm.getValue()); },
-        'Alt-Enter' : this.updateSqlText,
-        'Cmd-Enter' : this.updateSqlText
+        'Alt-Enter' : function(cm) { callUpdate(cm.getValue()); },
+        'Cmd-Enter' : function(cm) { callUpdate(cm.getValue()); }
       },
       mode: 'sql'
     };

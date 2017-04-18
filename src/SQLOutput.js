@@ -5,18 +5,26 @@ class SQLOutput extends Component {
   constructor(props) {
     super(props);
 
-    this.state = this.tryQuery(props.userQuery, undefined);
+    if (props.db) {
+      this.state = this.tryQuery(props.userQuery, undefined);
+    } else {
+      this.state = { results: [], query:'SELECT 1;' }
+    }
 
   }
   
   tryQuery(newUserQuery, lastQuery) {
+    if (!this.state.db) {
+      return { results: [], query: 'SELECT 1;' }; // db handle is not available, return empty query results
+    }
+    console.log('tryQuery', newUserQuery, lastQuery);
     //console.log('Running sql:', newUserQuery);
     var previousQuery = lastQuery || newUserQuery;
     var newQueryResults;
     var queryResults = {
       query: previousQuery,
       results: this.props.db.exec(previousQuery),
-      banner: 'SQL Looks good! See the results below.'
+      banner: 'SQL looks good! See the results below.'
     }
     var goodSql = true;
     try {
@@ -44,17 +52,19 @@ class SQLOutput extends Component {
   }
   
   componentWillReceiveProps(nextProps) {
+    if ((nextProps.db !== undefined) && (this.state.db === undefined)) {
+      this.setState({db:nextProps.db});
+    }
     if (nextProps.userQuery !== this.state.query) {
       this.runQueryAndUpdateState(nextProps.userQuery, this.state.query);
     }
   }
 
-//  componentDidMount() {
-//    this.runQuery(this.state.lastQuery);
-//  }
-
   render() {
     var results = this.state.results;
+    if (results.length === 0) {
+      return(<div>no results yet</div>);
+    }
     var rows = [];
     var i;
     var numCols = results[0].columns.length;

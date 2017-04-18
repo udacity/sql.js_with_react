@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import Button from './Button';
 import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import logo from './udacity_logo.png';
 import './App.css';
 import 'react-codemirror/node_modules/codemirror/lib/codemirror.css';
 import * as SQL from 'sql.js';
+import InitDb from './InitDb';
 
 class App extends Component {
 
@@ -12,37 +14,43 @@ class App extends Component {
     super(props);
 
     this.state = {
-      userQuery: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;',
+      userQuery: '',
+      newUserQuery: undefined,
+      db: undefined,
+      smallDb: false     // set this to true if queries can run as soon as the user types something
     }
-    this.setupDb();
     this.handleUserQuery = this.handleUserQuery.bind(this);
+    this.loadDbHandler = this.loadDbHandler.bind(this);
+    this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
+    this.sqlEvaluator = this.sqlEvaluator.bind(this);
 
+    // Set up simple, inline db (vs read from sqlite northwind dump)
+    // this.setupDb();
+    
   }
   
   setupDb() {
-    this.db = new SQL.Database();
-
-/*
-    var filename = './first_db.sql';
-    fs.readFile(filename, 'utf8', function(err, data) {
-      if (err) throw err;
-      console.log('OK: ' + filename);
-      console.log(data)
-    });
-*/
-
-    // Set up a simple database
-    this.db.run("CREATE TABLE employees (id integer, name varchar(50), salary float);");
-    // Insert three rows
-    this.db.run("INSERT INTO employees VALUES (?,?,?), (?,?,?), (?,?,?)", [1,'will',111.55, 2,'sam', 222.25, 3,'mary', 333.99]);
+    this.setState({db: new SQL.Database()});
   }
   
+  loadDbHandler(uInt8Array) {
+    this.setState({db: new SQL.Database(uInt8Array)});;
+    console.log('Loaded big db.');
+  }
 
   handleUserQuery(newUserQuery) {
     //console.log('setting user query to:', newUserQuery);
     this.setState({userQuery:newUserQuery});
   }
 
+  saveUserQueryForEvaluator(newUserQuery) {
+    console.log('Saving query for later:', newUserQuery);
+    this.setState({newUserQuery:newUserQuery});
+  }
+
+  sqlEvaluator() {
+    this.setState({userQuery: this.state.newUserQuery});
+  }
 
   render() {
     //console.log(this.state.userQuery);
@@ -50,12 +58,14 @@ class App extends Component {
       <div className="App">
       <div className="App-header">        
       <img src={logo} className="App-logo" alt="logo" />
-      <h2>Pure Client SQL Evaluator</h2>
+      <h3>Pure Client SQL Evaluator</h3>
+      <InitDb db={this.db} loadDbHandler={this.loadDbHandler} />
       </div>
       <p className="App-intro"></p>
-      <SQLText handleUserQuery={this.handleUserQuery}/>
+      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} smallDb={this.state.smallDb} />
+      <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>
       <div className="SqlOutput">
-      <SQLOutput db={this.db} userQuery={this.state.userQuery} />
+      <SQLOutput db={this.state.db} userQuery={this.state.userQuery} />
       </div>
       </div>
     );

@@ -9,7 +9,6 @@
 
 .App-header {
   background-color: #222;
-  height: 100px;
   padding: 10px;
   color: white;
 }
@@ -55,6 +54,12 @@
 
 .SqlOutput {
   margin:5px 4px 4px 4px;
+}
+
+.SqlLoadStatus {
+  font-size:10px;
+  text-align:left;
+  color:#fff;
 }
 
 @keyframes App-logo-spin {

@@ -1,17 +1,9 @@
-import * as SQL from 'sql.js';
-//import SQL from 'sqljs';
 import React, { Component } from 'react';
 
 class SQLOutput extends Component {
 
   constructor(props) {
     super(props);
-    this.db = new SQL.Database();
-
-    // Set up a simple database
-    this.db.run("CREATE TABLE employees (id integer, name varchar(50), salary float);");
-    // Insert three rows
-    this.db.run("INSERT INTO employees VALUES (?,?,?), (?,?,?), (?,?,?)", [1,'will',111.55, 2,'sam', 222.25, 3,'mary', 333.99]);
 
     this.state = this.tryQuery(props.userQuery, undefined);
 
@@ -23,12 +15,12 @@ class SQLOutput extends Component {
     var newQueryResults;
     var queryResults = {
       query: previousQuery,
-      results: this.db.exec(previousQuery),
+      results: this.props.db.exec(previousQuery),
       banner: 'SQL Looks good! See the results below.'
     }
     var goodSql = true;
     try {
-      newQueryResults = this.db.exec(newUserQuery);
+      newQueryResults = this.props.db.exec(newUserQuery);
       if (newQueryResults && newQueryResults.length > 0) {
         queryResults.results = newQueryResults;
         queryResults.query = newUserQuery;

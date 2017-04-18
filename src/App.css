@@ -45,8 +45,16 @@
   height:150px !important;
 }
 
+.Banner {
+  width:100%;
+  text-align:left;
+  font-style:italic;
+  font-size:14px;
+  margin:2px;
+}
+
 .SqlOutput {
-  margin:20px 4px 4px 4px;
+  margin:5px 4px 4px 4px;
 }
 
 @keyframes App-logo-spin {

@@ -8,14 +8,14 @@ class SQLText extends Component {
     super(props);
     this.state = {
       code: "-- Enter your SQL below, for instance:\n-- SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;\n",
-      handleUserSql : this.props.handleUserSql
+      handleUserQuery : this.props.handleUserQuery
     }
     this.updateCode = this.updateCode.bind(this);
   }
 
-  updateCode (currentSql) {
-    this.setState( {code:currentSql} );
-    this.state.handleUserSql(currentSql);
+  updateCode (currentQuery) {
+    this.setState( {code:currentQuery} );
+    this.state.handleUserQuery(currentQuery);
   }
 
   render() {

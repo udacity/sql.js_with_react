@@ -11,18 +11,19 @@ class App extends Component {
     super(props);
     //this.SQL = window.SQL; // extremely hacky but not sure how else to get to sqljs object
     this.state = {
-      userSql: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;'
+      userQuery: 'SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;',
     }
-    this.handleUserSql = this.handleUserSql.bind(this);
+    this.handleUserQuery = this.handleUserQuery.bind(this);
   }
   
-  handleUserSql(newSql) {
-    console.log('setting user sql to:', newSql);
-    this.setState({userSql:newSql});
+  handleUserQuery(newUserQuery) {
+    //console.log('setting user query to:', newUserQuery);
+    this.setState({userQuery:newUserQuery});
   }
 
+
   render() {
-    console.log(this.userSql);
+    //console.log(this.state.userQuery);
     return (
       <div className="App">
       <div className="App-header">        
@@ -30,9 +31,9 @@ class App extends Component {
       <h2>Pure Client SQL Evaluator</h2>
       </div>
       <p className="App-intro"></p>
-      <SQLText handleUserSql={this.handleUserSql}/>
+      <SQLText handleUserQuery={this.handleUserQuery}/>
       <div className="SqlOutput">
-        <SQLOutput userSql={this.state.userSql} />
+      <SQLOutput userQuery={this.state.userQuery} />
       </div>
       </div>
     );

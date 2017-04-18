@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CodeMirror from 'react-codemirror';
-import 'react-codemirror/node_modules/codemirror/mode/sql/sql';
+import '../node_modules/codemirror/mode/sql/sql';
 
 class SQLText extends Component {
 

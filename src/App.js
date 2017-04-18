@@ -4,7 +4,7 @@ import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import logo from './udacity_logo.png';
 import './App.css';
-import 'react-codemirror/node_modules/codemirror/lib/codemirror.css';
+import '../node_modules/codemirror/lib/codemirror.css';
 import * as SQL from 'sql.js';
 import InitDb from './InitDb';
 

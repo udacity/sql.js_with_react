@@ -73,13 +73,13 @@ class SQLOutput extends Component {
       columnHeads.push(<th key={results[0].columns[i]}>{results[0].columns[i]}</th>);
     }
     var result;
-    for (var i = 0; i < results[0].values.length; ++i) {
+    for (i = 0; i < results[0].values.length; ++i) {
       result = results[0].values[i];
       //console.log(result);
       var cols = [];
       //var randomArray = new Uint32Array(numCols);
       //window.crypto.getRandomValues(randomArray);
-      for (j = 0; j < numCols; ++j) {
+      for (var j = 0; j < numCols; ++j) {
         cols.push(<td key={j}>{result[j]}</td>);
       }
       //console.log(cols);

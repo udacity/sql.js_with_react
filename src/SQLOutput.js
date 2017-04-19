@@ -75,6 +75,7 @@ class SQLOutput extends Component {
     for (var result of results[0].values) {
       //console.log(result);
       var cols = [];
+      var array = new Uint32Array(numCols);
       window.crypto.getRandomValues(randomArray);
       for (i = 0; i < numCols; ++i) {
         cols.push(<td key={results[0].columns[i] + result[i] + randomArray[i]}>{result[i]}</td>);

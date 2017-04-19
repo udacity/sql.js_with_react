@@ -81,7 +81,7 @@ class SQLOutput extends Component {
         cols.push(<td key={i}>{result[i]}</td>);
       }
       //console.log(cols);
-      rows.push(<tr key={result[0]}>{cols}</tr>);
+      rows.push(<tr key={i}>{cols}</tr>);
     }
     return ( 
       <div className="SqlOutput">

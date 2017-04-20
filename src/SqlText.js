@@ -7,14 +7,13 @@ class SQLText extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sqlText: "-- Enter your SQL below, for instance:\n-- Small db: SELECT id,name,salary, round(salary) AS rounded_salary FROM employees ORDER BY salary ASC;\n-- Big db: SELECT EmployeeEd, FirstName, LastName, Address,City,Region,PostalCode,Country,HomePhone,Extension FROM EMPLOYEES ORDER BY LastName limit 5;\nSELECT FirstName, LastName from EMPLOYEES ORDER BY LastName;",
+      sqlText: props.query || "-- Enter your SQL below, for instance:\nSELECT FirstName, LastName from EMPLOYEES ORDER BY LastName;",
       handleUserQuery : this.props.handleUserQuery,
       saveUserQueryForEvaluator: props.saveUserQueryForEvaluator,
       smallDb: props.smallDb
     }
     this.runQueryImmediately = false;
     this.updateSqlText = this.updateSqlText.bind(this);
-    console.log('SQLText, smallDb:', this.state.smallDb);
   }
 
   componentWillMount() {

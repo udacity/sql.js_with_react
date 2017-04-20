@@ -14,11 +14,11 @@ class App extends Component {
     super(props);
 
     this.state = {
-      userQuery: '',
       newUserQuery: undefined,
       db: undefined,
       smallDb: false     // set this to true if queries can run as soon as the user types something
     }
+
     this.handleUserQuery = this.handleUserQuery.bind(this);
     this.loadDbHandler = this.loadDbHandler.bind(this);
     this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
@@ -26,13 +26,13 @@ class App extends Component {
 
     // Set up simple, inline db (vs read from sqlite northwind dump)
     // this.setupDb();
-    
+
   }
-  
+
   setupDb() {
     this.setState({db: new SQL.Database()});
   }
-  
+
   loadDbHandler(uInt8Array) {
     this.setState({db: new SQL.Database(uInt8Array)});;
     console.log('Loaded big db.');
@@ -56,17 +56,21 @@ class App extends Component {
     //console.log(this.state.userQuery);
     return (
       <div className="App">
-      <div className="App-header">        
-      <img src={logo} className="App-logo" alt="logo" />
-      <h3>Pure Client SQL Evaluator</h3>
-      <InitDb db={this.db} loadDbHandler={this.loadDbHandler} />
-      </div>
-      <p className="App-intro"></p>
-      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} smallDb={this.state.smallDb} />
-      <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>
-      <div className="SqlOutput">
-      <SQLOutput db={this.state.db} userQuery={this.state.userQuery} />
-      </div>
+        {this.props.useHeader !== "0" ?
+          <div className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+              <h3>Pure Client SQL Evaluator</h3>
+          </div>
+          : null
+        }
+
+        <InitDb db={this.db} loadDbHandler={this.loadDbHandler} />
+        <p className="App-intro"></p>
+        <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} smallDb={this.state.smallDb} query={this.props.query}/>
+        <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>
+        <div className="SqlOutput">
+          <SQLOutput db={this.state.db}/>
+        </div>
       </div>
     );
   }

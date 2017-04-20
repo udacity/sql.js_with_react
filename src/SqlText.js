@@ -7,26 +7,24 @@ class SQLText extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sqlText: props.query || "-- Enter your SQL below, for instance:\nSELECT FirstName, LastName from EMPLOYEES ORDER BY LastName;",
+      sqlText: props.query,
       handleUserQuery : this.props.handleUserQuery,
       saveUserQueryForEvaluator: props.saveUserQueryForEvaluator,
-      smallDb: props.smallDb
+      inlinelDb: props.inlineDb
     }
     this.runQueryImmediately = false;
     this.updateSqlText = this.updateSqlText.bind(this);
   }
 
   componentWillMount() {
-    if (!this.state.smallDb) {
-      this.state.saveUserQueryForEvaluator(this.state.sqlText);
-    }
+    this.state.saveUserQueryForEvaluator(this.state.sqlText);
   }
 
   updateSqlText (currentQuery) {
     //console.log('updateSqlText with currentQuery:', currentQuery);
     this.setState( {sqlText: currentQuery} );
-    if (this.state.smallDb || this.runQueryImmediately) {
-      //console.log('runNow:', currentQuery, this.state.smallDb);
+    if (this.runQueryImmediately) {
+      //console.log('runNow:', currentQuery);
       this.state.handleUserQuery(currentQuery);
       this.runQueryImmediately = false;
     } else {

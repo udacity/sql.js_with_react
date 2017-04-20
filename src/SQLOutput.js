@@ -14,10 +14,10 @@ class SQLOutput extends Component {
   }
   
   tryQuery(newUserQuery, lastQuery) {
-    if (!this.state.db) {
+    if (!(this.state && this.state.db)) {
       return { results: [], query: 'SELECT 1;' }; // db handle is not available, return empty query results
     }
-    console.log('tryQuery', newUserQuery, lastQuery);
+    //console.log('tryQuery', newUserQuery, lastQuery);
     //console.log('Running sql:', newUserQuery);
     var previousQuery = lastQuery || newUserQuery;
     var newQueryResults;
@@ -55,6 +55,7 @@ class SQLOutput extends Component {
     if ((nextProps.db !== undefined) && (this.state.db === undefined)) {
       this.setState({db:nextProps.db});
     }
+    //console.log('componentWillReceiveProps nextProps, state:', nextProps, this.state);
     if (nextProps.userQuery !== this.state.query) {
       this.runQueryAndUpdateState(nextProps.userQuery, this.state.query);
     }

@@ -13,24 +13,25 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      newUserQuery: undefined,
-      db: undefined,
-      smallDb: false     // set this to true if queries can run as soon as the user types something
+    var inlineDb = true;
+    if (inlineDb) {
+      this.state = {
+        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
+        db: new SQL.Database(),
+        inlineDb: true     // set this to true if queries can run as soon as the user types something
+      };
+    } else {
+      this.state = {
+        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
+        db: undefined,
+        inlineDb: false     // set this to true if queries can run as soon as the user types something
+      };
     }
-
     this.handleUserQuery = this.handleUserQuery.bind(this);
     this.loadDbHandler = this.loadDbHandler.bind(this);
     this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
     this.sqlEvaluator = this.sqlEvaluator.bind(this);
 
-    // Set up simple, inline db (vs read from sqlite northwind dump)
-    // this.setupDb();
-
-  }
-
-  setupDb() {
-    this.setState({db: new SQL.Database()});
   }
 
   loadDbHandler(uInt8Array) {
@@ -39,7 +40,7 @@ class App extends Component {
   }
 
   handleUserQuery(newUserQuery) {
-    //console.log('setting user query to:', newUserQuery);
+    //console.log('handleUserQuery: Setting user query to:', newUserQuery);
     this.setState({userQuery:newUserQuery});
   }
 
@@ -64,12 +65,12 @@ class App extends Component {
           : null
         }
 
-        <InitDb db={this.db} loadDbHandler={this.loadDbHandler} />
+        <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} />
         <p className="App-intro"></p>
-        <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} smallDb={this.state.smallDb} query={this.props.query}/>
+        <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
         <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>
         <div className="SqlOutput">
-          <SQLOutput db={this.state.db}/>
+          <SQLOutput userQuery={this.state.userQuery} db={this.state.db}/>
         </div>
       </div>
     );

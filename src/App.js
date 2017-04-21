@@ -38,7 +38,7 @@ class App extends Component {
 
   loadDbHandler(uInt8Array) {
     this.setState({db: new SQL.Database(uInt8Array)});;
-    console.log('Loaded big db.');
+    console.log('Loaded big db file:', this.state.remoteDbFile);
   }
 
   handleUserQuery(newUserQuery) {

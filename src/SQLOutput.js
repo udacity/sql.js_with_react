@@ -8,14 +8,14 @@ class SQLOutput extends Component {
     if (props.db) {
       this.state = this.tryQuery(props.userQuery, undefined);
     } else {
-      this.state = { results: [], query:'SELECT 1;' }
+      this.state = { results: [], query:props.userQuery }
     }
 
   }
   
   tryQuery(newUserQuery, lastQuery) {
     if (!(this.state && this.state.db)) {
-      return { results: [], query: 'SELECT 1;' }; // db handle is not available, return empty query results
+      return { results: [], query: newUserQuery }; // db handle is not available, return empty query results
     }
     //console.log('tryQuery', newUserQuery, lastQuery);
     //console.log('Running sql:', newUserQuery);

@@ -13,17 +13,19 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    var inlineDb = true;
+    var inlineDb = false;
     if (inlineDb) {
       this.state = {
         newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
         db: new SQL.Database(),
+        remoteDbFile: undefined,
         inlineDb: true     // set this to true if queries can run as soon as the user types something
       };
     } else {
       this.state = {
         newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
         db: undefined,
+        remoteDbFile: 'parch_and_posey_4_20_17a.db',
         inlineDb: false     // set this to true if queries can run as soon as the user types something
       };
     }
@@ -65,7 +67,7 @@ class App extends Component {
           : null
         }
 
-        <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} />
+        <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
         <p className="App-intro"></p>
         <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
         <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>

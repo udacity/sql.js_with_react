@@ -6,6 +6,7 @@ class InitDb extends Component {
   constructor(props) {
     super(props);
     this.loadDbHandler = props.loadDbHandler;
+    this.remoteDbFile = props.remoteDbFile;
     this.sqlDump = `
 --- Insert your SQL dump here:
 CREATE TABLE employees (id integer, name varchar(50), salary float);
@@ -25,7 +26,7 @@ INSERT INTO employees (id, name, salary) VALUES (1,'will',111.55), (2,'sam', 222
       for (var sqlLine of this.sqlDump.split("\n")) {
         var cleanLine = sqlLine.trim();
         if (cleanLine.length > 0) {
-          console.log(cleanLine);
+          //          console.log(cleanLine);
           this.db.run(cleanLine);
         }
       }
@@ -51,7 +52,7 @@ INSERT INTO employees (id, name, salary) VALUES (1,'will',111.55), (2,'sam', 222
   }
 
   loadSqlFromServer() {
-    this.createXhrRequest( "GET", 'Northwind.sl3', this.loadDbHandler, function( err, response ) {
+    this.createXhrRequest( "GET", this.remoteDbFile, this.loadDbHandler, function( err, response ) {
       // Do your post processing here. 
       if( err ) { console.log( "Error!" ); }
       var uInt8Array = new Uint8Array(response);

@@ -14,6 +14,8 @@ class SQLText extends Component {
     }
     this.runQueryImmediately = false;
     this.updateSqlText = this.updateSqlText.bind(this);
+    this.cursorMoved = this.cursorMoved.bind(this);
+    this.keyHandled = this.keyHandled.bind(this);
   }
 
   componentWillMount() {
@@ -32,6 +34,15 @@ class SQLText extends Component {
     }
   }
 
+  cursorMoved(cm) {
+    //console.log('cursormove codemirror object:',cm);
+  }
+
+  keyHandled(cm,event) {
+    console.log('keyhandle codemirror object / event:',cm,event);
+    
+  }
+
   render() {
     var callUpdate = function(currentQuery) { this.runQueryImmediately = true; this.updateSqlText(currentQuery); };
     callUpdate = callUpdate.bind(this);
@@ -44,7 +55,7 @@ class SQLText extends Component {
       },
       mode: 'sql'
     };
-    return <CodeMirror value={this.state.sqlText} onChange={this.updateSqlText} options={options} />
+    return <CodeMirror value={this.state.sqlText} onChange={this.updateSqlText} onCursorMoved={this.cursorMoved} onKeyHandled={this.keyHandled} options={options} />
   }
 }
 

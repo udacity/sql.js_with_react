@@ -23,7 +23,10 @@ class App extends Component {
         remoteDbFile: undefined,
         inlineDb: true,     // set this to true if queries can run as soon as the user types something
         recording: false,
-        playingBack: false
+        cursorMotion: [],
+        cursorMotionIndex: 1,
+        playingBack: false,
+        playBackStartTime: 0
       };
     } else {
       this.state = {
@@ -32,13 +35,15 @@ class App extends Component {
         remoteDbFile: 'parch_and_posey_4_20_17a.db',
         inlineDb: false,     // set this to true if queries can run as soon as the user types something
         recording: false,
-        playingBack: false
+        cursorMotion: [],
+        cursorMotionIndex: 1,
+        playingBack: false,
+        playBackStartTime: 0
       };
     }
     this.handleUserQuery = this.handleUserQuery.bind(this);
     this.loadDbHandler = this.loadDbHandler.bind(this);
     this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
-    this.cursorMotionIndex = -1;
   }
 
   componentDidMount() {
@@ -52,15 +57,16 @@ class App extends Component {
 
   recordCursorMotion(e) {
     if (this.state.recording) {
-      var cursorPos = { x: e.pageX, y: e.pageY };
-      this.cursorMotion.push (cursorPos);
-      console.log(cursorPos);
+      var now = new Date().getTime();
+      var cursorPos = { x: e.pageX, y: e.pageY, t: now };
+      this.setState({cursorMotion:[...this.state.cursorMotion, cursorPos]});
+      console.log('recorded:' , this.state.cursorMotion.length);
     }
   }
 
   startRecording() {
     this.cursorMotionIndex = -1;
-    this.cursorMotion = [];
+    this.setState({cursorMotion: []});
     console.log('start recording');
     this.setState({recording:true});
   }
@@ -72,18 +78,28 @@ class App extends Component {
 
   playRecording() {
     console.log('play recording');
-    this.setState({recording:false, playingBack:!this.state.playingBack});
+    var now = new Date().getTime();
+    this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, playBackStartTime: now});
   }
 
   getPosition() {
     //console.log('app:getPosition');
-    if ((this.cursorMotion.length > 0) && (this.cursorMotionIndex < this.cursorMotion.length) && (this.state.playingBack)) {
-      //console.log('sending position back');
-      this.cursorMotionIndex++;
-      if (this.cursorMotionIndex >= this.cursorMotion.length) {
-        this.cursorMotionIndex = 0;
+    if (this.state.playingBack) {
+      if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length - 1)) {
+        var now = new Date().getTime();
+        //console.log('sending position back');
+        var lastSpot = this.state.cursorMotion[this.state.cursorMotionIndex - 1];
+        var thisSpot = this.state.cursorMotion[this.state.cursorMotionIndex];
+        if (thisSpot.t - lastSpot.t < now - this.state.playBackStartTime) {
+          var checkState = this.state.cursorMotionIndex + 1;
+          this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, playBackStartTime: now});
+          if (checkState >= this.state.cursorMotion.length) {
+            this.setState({playingBack:false});
+            console.log('stopped playback');
+          }
+        }
+        return(this.state.cursorMotion[this.state.cursorMotionIndex]);
       }
-      return(this.cursorMotion[this.cursorMotionIndex]);
     }
     return({x:0,y:0});
   }

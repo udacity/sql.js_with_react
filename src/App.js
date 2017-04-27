@@ -26,7 +26,7 @@ class App extends Component {
         cursorMotion: [],
         cursorMotionIndex: 1,
         playingBack: false,
-        playBackStartTime: 0
+        lastPlayMarker: 0
       };
     } else {
       this.state = {
@@ -38,7 +38,7 @@ class App extends Component {
         cursorMotion: [],
         cursorMotionIndex: 1,
         playingBack: false,
-        playBackStartTime: 0
+        lastPlayMarker: 0
       };
     }
     this.handleUserQuery = this.handleUserQuery.bind(this);
@@ -79,23 +79,25 @@ class App extends Component {
   playRecording() {
     console.log('play recording');
     var now = new Date().getTime();
-    this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, playBackStartTime: now});
+    this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, lastPlayMarker: now});
   }
 
   getPosition() {
     //console.log('app:getPosition');
     if (this.state.playingBack) {
-      if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length - 1)) {
+      if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length)) {
         var now = new Date().getTime();
         //console.log('sending position back');
         var lastSpot = this.state.cursorMotion[this.state.cursorMotionIndex - 1];
         var thisSpot = this.state.cursorMotion[this.state.cursorMotionIndex];
-        if (thisSpot.t - lastSpot.t < now - this.state.playBackStartTime) {
+        if (thisSpot.t - lastSpot.t < now - this.state.lastPlayMarker) {
           var checkState = this.state.cursorMotionIndex + 1;
-          this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, playBackStartTime: now});
+          this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, lastPlayMarker: now});
+          console.log(checkState, this.state.cursorMotion.length);
           if (checkState >= this.state.cursorMotion.length) {
             this.setState({playingBack:false});
             console.log('stopped playback');
+            return({x:0, y:0});
           }
         }
         return(this.state.cursorMotion[this.state.cursorMotionIndex]);

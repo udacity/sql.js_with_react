@@ -30,7 +30,7 @@ class App extends Component {
   }
 
   execQuery() {
-    axios.post("http://localhost:3000/sql/api/query", {
+    axios.post("/sql/api/query", {
       query: this.state.query
     }).then(response => {
       if (response.data) {

@@ -1,40 +1,12 @@
-.App {
-  text-align: center;
-}
-
 .App-logo {
-  /*animation: App-logo-spin infinite 20s linear;*/
   height: 40px;
 }
 
 .App-header {
+  text-align: center;
   background-color: #222;
   padding: 10px;
   color: white;
-}
-
-.App-intro {
-  font-size: 14px;
-}
-
-.App table { 
-  border-collapse: collapse; 
-  width:100%;
-}
-
-.App table, .App th, .App td {
-  border: 1px solid black; 
-  text-align:left; 
-  font-family:Arial,Helvetica
-}
-
-.App th { 
-  color:white;
-  background-color:#55f;
-}
-
-.App th, .App td { 
-  padding:4px; 
 }
 
 .CodeMirror {
@@ -44,25 +16,6 @@
   height:150px !important;
 }
 
-.Banner {
-  width:100%;
-  text-align:left;
-  font-style:italic;
-  font-size:14px;
-  margin:2px;
-}
-
 .SqlOutput {
   margin:5px 4px 4px 4px;
-}
-
-.SqlLoadStatus {
-  font-size:10px;
-  text-align:left;
-  color:#fff;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }

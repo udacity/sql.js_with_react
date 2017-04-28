@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import FontAwesome from 'react-fontawesome';
 
 class Cursor extends Component {
   constructor(props) {
@@ -21,9 +22,15 @@ class Cursor extends Component {
   
   render() {
     return (
-      <div className="cursor" style={{left:this.state.position.x, top:this.state.position.y}}>Cursor</div>
+      <FontAwesome name="cursor" className='fa-mouse-pointer cursor' 
+      style={{
+        left: this.state.position.x, 
+        top: this.state.position.y, 
+        textShadow: '0 1px 0 rgba(0, 0, 0, 0.1)'
+      }} />
     );
   }
 }
 
 export default Cursor;
+

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Button from './Button';
 import Cursor from './Cursor';
+import RecordAudio from './RecordAudio';
 import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import SimplerCodeMirror from './SimplerCodeMirror';
@@ -26,6 +27,8 @@ class App extends Component {
         cursorMotion: [],
         cursorMotionIndex: 1,
         playingBack: false,
+        audioRecording: false,
+        audioPlayingBack: false,
         lastPlayMarker: 0
       };
     } else {
@@ -38,6 +41,8 @@ class App extends Component {
         cursorMotion: [],
         cursorMotionIndex: 1,
         playingBack: false,
+        audioRecording: false,
+        audioPlayingBack: false,
         lastPlayMarker: 0
       };
     }
@@ -60,28 +65,41 @@ class App extends Component {
       var now = new Date().getTime();
       var cursorPos = { x: e.pageX, y: e.pageY, t: now };
       this.setState({cursorMotion:[...this.state.cursorMotion, cursorPos]});
-      console.log('recorded:' , this.state.cursorMotion.length);
     }
   }
 
   startRecording() {
     this.cursorMotionIndex = -1;
     this.setState({cursorMotion: []});
-    console.log('start recording');
+    this.toggleAudioRecording();
+    console.log('start mouse recording');
     this.setState({recording:true});
   }
 
   stopRecording() {
-    console.log('stop recording');
+    console.log('stop mouse recording');
     this.setState({recording:false});
+    this.toggleAudioRecording();
   }
 
   playRecording() {
-    console.log('play recording');
+    console.log('play mouse recording');
     var now = new Date().getTime();
     this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, lastPlayMarker: now});
+    this.state.recordedAudio.play();
   }
 
+  toggleAudioRecording() {
+    this.setState({audioRecording:!this.state.audioRecording});
+  }
+
+  saveAudioForPlayback(audio) {
+    this.setState({recordedAudio:audio});
+  }
+
+  playAudioRecording() {
+  }
+  
   getPosition() {
     //console.log('app:getPosition');
     if (this.state.playingBack) {
@@ -93,7 +111,6 @@ class App extends Component {
         if (thisSpot.t - lastSpot.t < now - this.state.lastPlayMarker) {
           var checkState = this.state.cursorMotionIndex + 1;
           this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, lastPlayMarker: now});
-          console.log(checkState, this.state.cursorMotion.length);
           if (checkState >= this.state.cursorMotion.length) {
             this.setState({playingBack:false});
             console.log('stopped playback');
@@ -144,6 +161,8 @@ class App extends Component {
       <Button click={() => this.startRecording() } label={"Start recording"} />
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
+      <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
+      <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audio) => this.saveAudioForPlayback(audio) } />
       <SimplerCodeMirror />
       <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       </div>

@@ -6,45 +6,23 @@ class SQLText extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      sqlText: props.query,
-      handleUserQuery : this.props.handleUserQuery,
-      saveUserQueryForEvaluator: props.saveUserQueryForEvaluator,
-      inlinelDb: props.inlineDb
-    }
-    this.runQueryImmediately = false;
-    this.updateSqlText = this.updateSqlText.bind(this);
-  }
-
-  componentWillMount() {
-    this.state.saveUserQueryForEvaluator(this.state.sqlText);
-  }
-
-  updateSqlText (currentQuery) {
-    //console.log('updateSqlText with currentQuery:', currentQuery);
-    this.setState( {sqlText: currentQuery} );
-    if (this.runQueryImmediately) {
-      //console.log('runNow:', currentQuery);
-      this.state.handleUserQuery(currentQuery);
-      this.runQueryImmediately = false;
-    } else {
-      this.state.saveUserQueryForEvaluator(currentQuery);
-    }
-  }
-
-  render() {
-    var callUpdate = function(currentQuery) { this.runQueryImmediately = true; this.updateSqlText(currentQuery); };
-    callUpdate = callUpdate.bind(this);
-    var options = {
+    var saveAndExec = function (query) {
+      this.props.setQuery(query);
+      this.props.execQuery();
+    }.bind(this);
+    this.cmOptions = {
       lineNumbers: true,
       extraKeys: {
-        'Ctrl-Enter': function(cm) { callUpdate(cm.getValue()); },
-        'Alt-Enter' : function(cm) { callUpdate(cm.getValue()); },
-        'Cmd-Enter' : function(cm) { callUpdate(cm.getValue()); }
+        'Ctrl-Enter': function(cm) { saveAndExec(cm.getValue()); },
+        'Alt-Enter' : function(cm) { saveAndExec(cm.getValue()); },
+        'Cmd-Enter' : function(cm) { saveAndExec(cm.getValue()); }
       },
       mode: 'sql'
     };
-    return <CodeMirror value={this.state.sqlText} onChange={this.updateSqlText} options={options} />
+  }
+
+  render() {
+    return <CodeMirror value={this.props.getQuery()} onChange={this.props.setQuery} options={this.cmOptions} />
   }
 }
 

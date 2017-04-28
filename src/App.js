@@ -3,60 +3,53 @@ import Button from './Button';
 import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import logo from './udacity_logo.png';
+import axios from 'axios';
 import './App.css';
 import '../node_modules/codemirror/lib/codemirror.css';
-import * as SQL from 'sql.js';
-import InitDb from './InitDb';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
 
-    var inlineDb = false;
-    if (inlineDb) {
-      this.state = {
-        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
-        db: new SQL.Database(),
-        remoteDbFile: undefined,
-        inlineDb: true     // set this to true if queries can run as soon as the user types something
-      };
-    } else {
-      this.state = {
-        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
-        db: undefined,
-        remoteDbFile: 'parch_and_posey_4_20_17a.db',
-        inlineDb: false     // set this to true if queries can run as soon as the user types something
-      };
+    this.state = {
+      query: props.query || "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;"
     }
-    this.handleUserQuery = this.handleUserQuery.bind(this);
-    this.loadDbHandler = this.loadDbHandler.bind(this);
-    this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
-    this.sqlEvaluator = this.sqlEvaluator.bind(this);
 
+    this.execQuery = this.execQuery.bind(this);
+    this.setQuery = this.setQuery.bind(this);
+    this.getQuery = this.getQuery.bind(this);
   }
 
-  loadDbHandler(uInt8Array) {
-    this.setState({db: new SQL.Database(uInt8Array)});;
-    console.log('Loaded big db file:', this.state.remoteDbFile);
+  setQuery(query) {
+    this.setState({query: query});
   }
 
-  handleUserQuery(newUserQuery) {
-    //console.log('handleUserQuery: Setting user query to:', newUserQuery);
-    this.setState({userQuery:newUserQuery});
+  getQuery() {
+    return this.state.query;
   }
 
-  saveUserQueryForEvaluator(newUserQuery) {
-    //console.log('Saving query for later:', newUserQuery);
-    this.setState({newUserQuery:newUserQuery});
-  }
-
-  sqlEvaluator() {
-    this.setState({userQuery: this.state.newUserQuery});
+  execQuery() {
+    axios.post("http://localhost:3000/sql/api/query", {
+      query: this.state.query
+    }).then(response => {
+      if (response.data) {
+        this.setState({queryResult: response.data, queryError: undefined});
+      } else {
+        this.setState({queryResult: undefined, queryError: "no data in response"})
+      }
+    }).catch(err => {
+      if (err.response && err.response.data && err.response.data.message) {
+        console.log(err.response.data.message);
+        this.setState({queryResult: err.response.data, queryError: err.response.data.message});
+      } else {
+        console.log(err.message)
+        this.setState({queryResult: undefined, queryError: err.message});
+      }
+    });
   }
 
   render() {
-    //console.log(this.state.userQuery);
     return (
       <div className="App">
         {this.props.useHeader !== "0" ?
@@ -67,12 +60,10 @@ class App extends Component {
           : null
         }
 
-        <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
-        <p className="App-intro"></p>
-        <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
-        <Button sqlEvaluator={this.sqlEvaluator}>Evaluate SQL (Ctrl-Enter)</Button>
+        <SQLText query={this.state.query} setQuery={this.setQuery} execQuery={this.execQuery} getQuery={this.getQuery} />
+        <Button onClick={this.execQuery}>Evaluate SQL (Ctrl-Enter)</Button>
         <div className="SqlOutput">
-          <SQLOutput userQuery={this.state.userQuery} db={this.state.db}/>
+          <SQLOutput queryResult={this.state.queryResult} queryError={this.state.queryError}/>
         </div>
       </div>
     );

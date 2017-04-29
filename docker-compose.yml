@@ -1,0 +1,15 @@
+version: '3'
+services:
+  db:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=temp
+      - POSTGRES_USER=temp
+  web:
+    build: .
+    ports:
+      - "40002:40002"
+    depends_on:
+      - db
+    links:
+      - db

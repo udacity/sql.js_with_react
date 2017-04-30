@@ -29,6 +29,7 @@ class App extends Component {
         playingBack: false,
         audioRecording: false,
         audioPlayingBack: false,
+        audioUrl: '',
         lastPlayMarker: 0
       };
     } else {
@@ -43,6 +44,7 @@ class App extends Component {
         playingBack: false,
         audioRecording: false,
         audioPlayingBack: false,
+        audioUrl: '',
         lastPlayMarker: 0
       };
     }
@@ -93,8 +95,8 @@ class App extends Component {
     this.setState({audioRecording:!this.state.audioRecording});
   }
 
-  saveAudioForPlayback(audio) {
-    this.setState({recordedAudio:audio});
+  saveAudioForPlayback(audioUrl) {
+    this.setState({audioUrl:audioUrl});
   }
 
   playAudioRecording() {
@@ -162,9 +164,9 @@ class App extends Component {
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
       <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
-      <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audio) => this.saveAudioForPlayback(audio) } />
       <SimplerCodeMirror />
       <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
+      <RecordAudio audioRecording={this.state.audioRecording} audioUrl={this.state.audioUrl} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );
   }

@@ -5,7 +5,7 @@ class RecordAudio extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentlyRecording: false
+      currentlyRecording: false,
     }
     this.saveAudioForPlayback = props.saveAudioForPlayback;
   }
@@ -22,6 +22,9 @@ class RecordAudio extends Component {
       } else {
         this.stopAudioRecording();
       }
+    }
+    if (nextProps.audioUrl !== this.state.audioUrl) {
+      this.setState({audioUrl: nextProps.audioUrl});
     }
   }
 
@@ -42,37 +45,12 @@ class RecordAudio extends Component {
   saveRecordedAudio(e) {
     console.log("data available");
 
-    //var clipName = prompt('Enter a name for your sound clip');
-    var clipName = 'test';
+    var audioUrl = window.URL.createObjectURL(e.data);
 
-    var clipContainer = document.createElement('article');
-    var clipLabel = document.createElement('p');
-    var audio = document.createElement('audio');
-    var deleteButton = document.createElement('button');
-    
-    clipContainer.classList.add('clip');
-    audio.setAttribute('controls', '');
-    deleteButton.innerHTML = "Delete";
-    clipLabel.innerHTML = clipName;
-
-    clipContainer.appendChild(audio);
-    clipContainer.appendChild(clipLabel);
-    clipContainer.appendChild(deleteButton);
-    document.body.appendChild(clipContainer);
-
-    var audioURL = window.URL.createObjectURL(e.data);
-    audio.src = audioURL;
-    audio.play();
-
-//    var audioCtx = new AudioContext();
-//    var source = audioCtx.createMediaElementSource(audio);
-//    source.connect(audioCtx.destination);
-    this.saveAudioForPlayback(audio);
-
-    deleteButton.onclick = function(e) {
-      var evtTgt = e.target;
-      evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-    }
+    //    var audioCtx = new AudioContext();
+    //    var source = audioCtx.createMediaElementSource(audio);
+    //    source.connect(audioCtx.destination);
+    this.saveAudioForPlayback(audioUrl);
   }
 
   
@@ -111,6 +89,7 @@ class RecordAudio extends Component {
   render() {
     return  (
       <span>
+      <audio src={this.state.audioUrl} controls />
       </span>
     );
   } 

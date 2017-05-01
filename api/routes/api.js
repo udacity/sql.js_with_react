@@ -14,12 +14,12 @@ router.all('/tables', function(req, res, next) {
     });
 });
 
-router.post('/initdb', function(req, res, next) {
+router.all('/initdb', function(req, res, next) {
   // In the future, posting the desired db might be required somehow; ie {"db":"parch"}
   req.query("drop owned by temp cascade;")
-    .then(function(res) {
+    .then(function(result) {
       return req.query(parch);
-    }).then(function() {
+    }).then(function(result) {
       res.json({ok:1});
     }).catch(err => {
       err.status = 500;

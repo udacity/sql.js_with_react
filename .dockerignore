@@ -1,3 +1,6 @@
 **/node_modules
 ui/build
 **/npm-debug.log
+.gitignore
+.git
+**/.DS_Store

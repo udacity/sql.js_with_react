@@ -23,9 +23,6 @@ class RecordAudio extends Component {
         this.stopAudioRecording();
       }
     }
-    if (nextProps.audioUrl !== this.state.audioUrl) {
-      this.setState({audioUrl: nextProps.audioUrl});
-    }
   }
 
   startAudioRecording() {
@@ -46,11 +43,16 @@ class RecordAudio extends Component {
     console.log("data available");
 
     var audioUrl = window.URL.createObjectURL(e.data);
+    // This works so nice and simple. From: http://stackoverflow.com/questions/33755524/how-to-load-audio-completely-before-playing (first answer)
+    var audioObj = new Audio (audioUrl);
+    audioObj.load();
+    //audioObj.play();
+    //window.audioObj = audioObj;
+    // set time of clip for scrubbing: http://stackoverflow.com/questions/9563887/setting-html5-audio-position
 
-    //    var audioCtx = new AudioContext();
     //    var source = audioCtx.createMediaElementSource(audio);
     //    source.connect(audioCtx.destination);
-    this.saveAudioForPlayback(audioUrl);
+    this.saveAudioForPlayback(audioObj);
   }
 
   
@@ -89,7 +91,7 @@ class RecordAudio extends Component {
   render() {
     return  (
       <span>
-      <audio src={this.state.audioUrl} controls />
+      &nbsp;
       </span>
     );
   } 

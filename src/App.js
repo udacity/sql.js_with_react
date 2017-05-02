@@ -85,18 +85,18 @@ class App extends Component {
   }
 
   playRecording() {
-    console.log('play mouse recording');
+    console.log('play mouse and audio recording');
     var now = new Date().getTime();
     this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, lastPlayMarker: now});
-    this.state.recordedAudio.play();
+    this.state.audioObj.play();
   }
 
   toggleAudioRecording() {
     this.setState({audioRecording:!this.state.audioRecording});
   }
 
-  saveAudioForPlayback(audioUrl) {
-    this.setState({audioUrl:audioUrl});
+  saveAudioForPlayback(audioObj) {
+    this.setState({audioObj:audioObj});
   }
 
   playAudioRecording() {
@@ -166,7 +166,7 @@ class App extends Component {
       <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
       <SimplerCodeMirror />
       <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
-      <RecordAudio audioRecording={this.state.audioRecording} audioUrl={this.state.audioUrl} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
+      <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );
   }

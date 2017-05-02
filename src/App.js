@@ -158,14 +158,19 @@ class App extends Component {
       <Cursor id="cursor" getPosition={() => this.getPosition() } / >
       <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
       <p className="App-intro"></p>
-      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
-      <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
+{
+  //      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
+  // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
+}
+      <SimplerCodeMirror />
       <Button click={() => this.startRecording() } label={"Start recording"} />
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
       <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
-      <SimplerCodeMirror />
-      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
+{
+//      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
+}
+      <iframe className="shell" src="http://13.58.45.98:3000" />
       <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );

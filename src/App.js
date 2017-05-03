@@ -10,6 +10,7 @@ import './App.css';
 import '../node_modules/codemirror/lib/codemirror.css';
 import * as SQL from 'sql.js';
 import InitDb from './InitDb';
+import Axios from 'axios';
 
 class App extends Component {
 
@@ -76,12 +77,14 @@ class App extends Component {
     this.toggleAudioRecording();
     console.log('start mouse recording');
     this.setState({recording:true});
+    Axios.get('http://localhost:3001/record/start');
   }
 
   stopRecording() {
     console.log('stop mouse recording');
     this.setState({recording:false});
     this.toggleAudioRecording();
+    Axios.get('http://localhost:3001/record/stop');
   }
 
   playRecording() {
@@ -170,7 +173,7 @@ class App extends Component {
 {
 //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
 }
-      <iframe className="shell" src="http://13.58.45.98:3000" />
+      <iframe className="shell" src="http://localhost:3001" />
       <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );

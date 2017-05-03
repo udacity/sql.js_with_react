@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "width": 140,
+  "height": 11,
+  "duration": 7.633656,
+  "command": null,
+  "title": null,
+  "env": {
+    "TERM": "xterm-256color",
+    "SHELL": "/bin/bash"
+  },
+  "stdout": [
+    [
+      0.018464,
+      "\u001b[?1034hbash-3.2$ "
+    ],
+    [
+      2.815546,
+      "t"
+    ],
+    [
+      0.11103,
+      "o"
+    ],
+    [
+      0.051938,
+      "p"
+    ],
+    [
+      0.216678,
+      "\r\n"
+    ],
+    [
+      0.008991,
+      "\u001b[?1049h\u001b[1;11r\u001b(B\u001b[m\u001b[4l\u001b[?7h\u001b[?1034h\u001b[?1h\u001b="
+    ],
+    [
+      0.37677,
+      "\u001b[H\u001b[2JProcesses: 427 total, 3 running, 424 sleeping, 1919 threads\u001b[1;132H16:51:53\r\u001b[2dLoad Avg: 1.71, 1.89, 1.90  CPU usage: 16.66% user, 28.33% sys, 55.0% idle  SharedLibs: 142M resident, 29M data, 19M linkedit.\r\u001b[3dMemRegions: 131162 total, 6040M resident, 129M private, 1777M shared. PhysMem: 16G used (2862M wired), 240M unused.\r\u001b[4dVM: 4330G vsize, 621M framework vsize, 161208740(0) swapins, 163525355(0) swapouts. Networks: packets: 39435577/24G in, 31652956/14G out.\r\u001b[5dDisks: 19911638/847G read, 50283553/1664G written.\r\u001b[7dPID    COMMAND\u001b[21G%CPU TIME     #TH   #WQ  #PORT MEM    PURG   CMPRS  PGRP  PPID  STATE    BOOSTS\u001b[7;111H%CPU_ME %CPU_OTHRS UID\r\u001b[8d53053  top\u001b[8;21H0.0  00:00.29 1/1   0    14+   3144K+ 0B     0B     53053 53052 running  *0[1+]\u001b[8;111H0.00000 0.00000    0\r\u001b[9d53052  bash\u001b[9;21H0.0  00:00.00 1     0    16+   696K+  0B     0B     53052 53051 sleeping *0[1+]\u001b[9;111H0.00000 0.00000    501\r\u001b[10d53051  Python\u001b[21G0.0  00:00.26 1     0    13+   15M+   0B     0B     53051 53042 sleeping *0["
+    ],
+    [
+      3.7e-05,
+      "1+]\u001b[10;111H0.00000 0.00000    501\r\u001b[11d53047  mdworker     0.0  00:00.03 3     1    46+   3092K+ 0B     0B     53047 1     sleeping *0[1+]\u001b[11;111H0.00000 0.00000    501"
+    ],
+    [
+      1.041798,
+      "\u001b[1;23H2\u001b[1;36H5\u001b[1;51H8\u001b[139G4\u001b[2;40H8.8% user, 6.96% sys, 84.94\u001b[2P\u001b[3;92H45\u001b[3;105H52\u001b[4;110H9\u001b[4;127H7\u001b[5;15H9\u001b[8;21H7.7\u001b[8;32H3\u001b[8;46H20+   428\u001b[8;98H] \u001b[8;113H16223\u001b[9;48H \u001b[56G \u001b[9;98H] \u001b[10;48H \u001b[55G \u001b[10;98H] \u001b[11;48H \u001b[11;57H \u001b[11;98H] \u001b[133G"
+    ],
+    [
+      0.447206,
+      "\u001b[11;1H\u001b[?1049l\r\u001b[?1l\u001b>"
+    ],
+    [
+      0.001332,
+      "bash-3.2$ "
+    ],
+    [
+      2.53985,
+      "exit\r\nexit\r\n"
+    ]
+  ]
+}

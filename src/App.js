@@ -174,6 +174,7 @@ class App extends Component {
 //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
 }
       <iframe className="shell" src="http://localhost:3001" />
+      <asciinema-player src="/recording1.json"></asciinema-player>
       <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );

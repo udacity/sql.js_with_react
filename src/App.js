@@ -153,27 +153,48 @@ class App extends Component {
       <div className="App" ref={(node) => {this.node = node;}} >
         {this.props.useHeader !== "0" ?
           <div className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <h3>Pure Client SQL Evaluator</h3>
+          <img src={logo} className="App-logo" alt="logo" />
+          <h3>Pure Client SQL Evaluator</h3>
           </div>
           : null
         }
       <Cursor id="cursor" getPosition={() => this.getPosition() } / >
       <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
-      <p className="App-intro"></p>
-{
-  //      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
-  // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
-}
+      {
+//        <p className="App-intro"></p>
+        //      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
+        // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
+      }
+      <div className="clipBox">
+      <div className="termText">
+      will@localhost's password: <br/>
+Last login: Thu May  4 21:50:44 2017 from ::1<br/>
+Wills-MacBook-Pro:~ will$ <br/>
+Wills-MacBook-Pro:~ will$ ls -l<br/>
+total 0<br/>
+drwx------@   5 will  staff   170 Mar 15 13:17 Applications<br/>
+drwx------@  12 will  staff   408 Apr 25 21:24 Desktop<br/>
+drwx------@  42 will  staff  1428 Apr  6 15:23 Documents<br/>
+drwx------+ 101 will  staff  3434 May  4 09:03 Downloads<br/>
+drwx------@  62 will  staff  2108 Apr  6 15:51 Library<br/>
+drwx------+   3 will  staff   102 Feb 27 17:10 Movies<br/>
+drwx------+   4 will  staff   136 Mar 20 15:14 Music<br/>
+drwx------+   6 will  staff   204 Feb 28 16:05 Pictures<br/>
+drwxr-xr-x+   5 will  staff   170 Feb 27 17:10 Public<br/>
+drwx------    6 will  staff   204 Mar 20 16:27 VirtualBox VMs<br/>
+drwxr-xr-x    2 will  staff    68 Mar  8 11:33 node_modules<br/>
+Wills-MacBook-Pro:~ will$ <br/>
+        </div>
+      </div>
+      <iframe className="shell" src="http://localhost:3001" />
       <SimplerCodeMirror />
       <Button click={() => this.startRecording() } label={"Start recording"} />
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
       <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
-{
-//      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
-}
-      <iframe className="shell" src="http://localhost:3001" />
+      {
+        //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
+      }
       <asciinema-player src="/recording1.json"></asciinema-player>
       <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>

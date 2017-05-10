@@ -12,6 +12,7 @@
   padding: 10px;
   color: white;
   height:15px;
+  display:none;
 }
 
 .App-intro {
@@ -86,4 +87,24 @@
 .shell {
   width:100%;
   height:150px;
+}
+
+.clipBox {
+  display:flex;
+  flex-direction:column-reverse;
+  overflow-y:scroll;
+  text-align:left;
+  width:100%;
+  height:200px;
+  border:none;
+  margin:0 0 20px 0;
+  font-family: "DejaVu Sans Mono", "Everson Mono", FreeMono, Menlo, Terminal, monospace;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  white-space: pre;
+  color: white;
+  background-color: rgb(16, 16, 16);
+}
+
+.termText {
 }

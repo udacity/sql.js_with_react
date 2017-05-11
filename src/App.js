@@ -5,6 +5,7 @@ import RecordAudio from './RecordAudio';
 import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import SimplerCodeMirror from './SimplerCodeMirror';
+import Xterm from './Xterm';
 import logo from './udacity_logo.png';
 import './App.css';
 import '../node_modules/codemirror/lib/codemirror.css';
@@ -165,29 +166,9 @@ class App extends Component {
         //      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
         // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
       }
-      <div className="clipBox">
-      <div className="termText">
-      will@localhost's password: <br/>
-Last login: Thu May  4 21:50:44 2017 from ::1<br/>
-Wills-MacBook-Pro:~ will$ <br/>
-Wills-MacBook-Pro:~ will$ ls -l<br/>
-total 0<br/>
-drwx------@   5 will  staff   170 Mar 15 13:17 Applications<br/>
-drwx------@  12 will  staff   408 Apr 25 21:24 Desktop<br/>
-drwx------@  42 will  staff  1428 Apr  6 15:23 Documents<br/>
-drwx------+ 101 will  staff  3434 May  4 09:03 Downloads<br/>
-drwx------@  62 will  staff  2108 Apr  6 15:51 Library<br/>
-drwx------+   3 will  staff   102 Feb 27 17:10 Movies<br/>
-drwx------+   4 will  staff   136 Mar 20 15:14 Music<br/>
-drwx------+   6 will  staff   204 Feb 28 16:05 Pictures<br/>
-drwxr-xr-x+   5 will  staff   170 Feb 27 17:10 Public<br/>
-drwx------    6 will  staff   204 Mar 20 16:27 VirtualBox VMs<br/>
-drwxr-xr-x    2 will  staff    68 Mar  8 11:33 node_modules<br/>
-Wills-MacBook-Pro:~ will$ <br/>
-        </div>
-      </div>
-      <iframe className="shell" src="http://localhost:3001" />
+
       <SimplerCodeMirror />
+      <Xterm />
       <Button click={() => this.startRecording() } label={"Start recording"} />
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
@@ -195,7 +176,9 @@ Wills-MacBook-Pro:~ will$ <br/>
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       }
-      <asciinema-player src="/recording1.json"></asciinema-player>
+      { 
+        // <asciinema-player src="/recording1.json"></asciinema-player> 
+      }
       <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );

@@ -110,9 +110,9 @@
 }
 
 #terminal-container {
-  width: 90%;
-  height: 350px;
-  margin: 0 auto;
+  /*width: 90%;*/
+  height: 250px;
+  margin: 2px;
   padding: 2px;
 }
 

@@ -32,7 +32,8 @@ class App extends Component {
         audioRecording: false,
         audioPlayingBack: false,
         audioUrl: '',
-        lastPlayMarker: 0
+        lastPlayMarker: 0,
+        xtermRecording: false
       };
     } else {
       this.state = {
@@ -47,7 +48,8 @@ class App extends Component {
         audioRecording: false,
         audioPlayingBack: false,
         audioUrl: '',
-        lastPlayMarker: 0
+        lastPlayMarker: 0,
+        xtermRecording: false
       };
     }
     this.handleUserQuery = this.handleUserQuery.bind(this);
@@ -99,6 +101,10 @@ class App extends Component {
     this.setState({audioRecording:!this.state.audioRecording});
   }
 
+  toggleXtermRecording() {
+    this.setState({xtermRecording:!this.state.xtermRecording});
+  }
+  
   saveAudioForPlayback(audioObj) {
     this.setState({audioObj:audioObj});
   }
@@ -168,7 +174,7 @@ class App extends Component {
       }
 
       <SimplerCodeMirror />
-      <Xterm />
+      <Xterm recording={this.state.xtermRecording} playingBack={this.state.playingBack} />
       <Button click={() => this.startRecording() } label={"Start recording"} />
       <Button click={() => this.stopRecording()  } label={"Stop recording"} />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />

@@ -14,7 +14,8 @@ class Xterm extends Component {
       history: [],
       recording: true,
       replayInterval: undefined,
-      replayStartTime: undefined      
+      replayStartTime: undefined,
+      pid: undefined
     }
     this.runRealTerminal = this.runRealTerminal.bind(this);
     this.playHistory = this.playHistory.bind(this);
@@ -48,19 +49,19 @@ class Xterm extends Component {
       tabStopWidth: 10
     });
 
-    this.term.on('resize', function (size) {
-      if (!this.pid) {
+    this.term.on('resize', (size) => {
+      console.log('resizing');
+      if (!this.state.pid) {
         return;
       }
       var cols = size.cols,
           rows = size.rows,
-          url = '/terminals/' + this.pid + '/size?cols=' + cols + '&rows=' + rows;
+          url = `${host.httpHost}/terminals/${this.state.pid}/size?cols=${cols}&rows=${rows}`;
 
       fetch(url, {method: 'POST'});
     });
 
     this.term.open(terminalContainer, { focus: true } );
-    this.term.fit();
 
     const host = this.getXtermHost();
     fetch(`${host.httpHost}/terminal/history/reset`);
@@ -81,12 +82,12 @@ class Xterm extends Component {
       });
     });
 
-    var cols = 118;
-    var rows = 19;
+    var cols = 125;
 
-    fetch(`${host.httpHost}/terminals?cols=${cols}&rows=${rows}`, {method: 'POST'})
+    fetch(`${host.httpHost}/terminals?cols=${cols}`, {method: 'POST'})
       .then(res => res.text()).then((pid) => { 
-        window.pid = pid;
+        this.term.fit();
+        this.setState({pid: pid});
         console.log('got pid:', pid);
         var socketUrl = host.socketUrl + pid;
         console.log('opening socket to :', socketUrl);
@@ -103,7 +104,11 @@ class Xterm extends Component {
   }
 
   playHistory() {
-    if (this.state.history.length > 0) {
+    if (this.props.recording || this.state.history.length === 0) {
+      console.log('history done');
+      this.setState({recording:true});
+      clearInterval(this.state.replayInterval);
+    } else {
       console.log('running history');
       var nextAction = this.state.history[0];
       var timeDiff = new Date().getTime() - this.state.replayStartTime;
@@ -120,10 +125,6 @@ class Xterm extends Component {
           this.term.viewport.viewportElement.scrollTop = scrollTop;
         }
       }
-    } else {
-      console.log('history done');
-      this.setState({recording:true});
-      clearInterval(this.state.replayInterval);
     }
   }
 

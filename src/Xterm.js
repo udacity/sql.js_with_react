@@ -1,9 +1,11 @@
 import Terminal from '../public/xterm.js';
-import '../public/attach/attach.js';
-import '../public/fit/fit.js';
+import '../public/addons/attach/attach.js';
+import '../public/addons/fit/fit.js';
 import Button from './Button';
 import React, { Component } from 'react';
 
+//require('../public/addons/attach/attach');
+//require('../public/addons/fit/fit');
 
 class Xterm extends Component {
   constructor(props) {
@@ -57,8 +59,8 @@ class Xterm extends Component {
       fetch(url, {method: 'POST'});
     });
 
-    this.term.open(terminalContainer, { focus: true} );
-    //this.term.fit();
+    this.term.open(terminalContainer, { focus: true } );
+    this.term.fit();
 
     const host = this.getXtermHost();
     fetch(`${host.httpHost}/terminal/history/reset`);
@@ -79,8 +81,8 @@ class Xterm extends Component {
       });
     });
 
-    var cols = 200;
-    var rows = 24;
+    var cols = 118;
+    var rows = 19;
 
     fetch(`${host.httpHost}/terminals?cols=${cols}&rows=${rows}`, {method: 'POST'})
       .then(res => res.text()).then((pid) => { 

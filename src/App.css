@@ -110,10 +110,10 @@
 }
 
 #terminal-container {
-    width: 800px;
-    height: 450px;
-    margin: 0 auto;
-    padding: 2px;
+  width: 90%;
+  height: 350px;
+  margin: 0 auto;
+  padding: 2px;
 }
 
 #terminal-container .terminal {

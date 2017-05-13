@@ -172,7 +172,7 @@ class App extends Component {
 
       <SimplerCodeMirror />
       <Xterm recording={this.state.audioRecording} playingBack={this.state.playingBack} />
-      <Button click={() => {(this.state.audioRecording ? this.startRecording() : this.stopRecording() ) }} 
+      <Button click={() => {(this.state.audioRecording ? this.stopRecording() : this.startRecording() ) }} 
         label={(this.state.audioRecording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square" ></i>) } />
       <Button click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } />
       {

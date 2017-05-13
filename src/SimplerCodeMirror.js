@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../node_modules/codemirror/mode/javascript/javascript';
 
 class SimplerCodeMirror extends Component {
 
@@ -21,6 +22,8 @@ class SimplerCodeMirror extends Component {
     this.cm.on('change', this.handleChange);
     this.cm.on('cursorActivity', this.handleCursorActivity);
     this.cm.on('scroll', this.handleScroll);
+    var cursorInfo = this.cm.getCursor();
+    console.log('at startup, cursorInfo:', cursorInfo);
   }
 
   handleChange(cm,action) {
@@ -54,7 +57,7 @@ class SimplerCodeMirror extends Component {
   render() {
     return  (
       <div className='editorDiv'>
-        <textarea ref='textarea' name='codemirror_textarea' defaultValue={"some text\nmore text\neven more text\n\n\n\n\n\n\n\n\nlast line"} autoComplete='off' />
+        <textarea ref='textarea' name='codemirror_textarea' defaultValue={"// This is a for loop in Javascript\nfor (var i = 0; i < 10; ++i) {\n  console.log(i);\n}\n"} autoComplete='off' />
       </div>
     );
   } 

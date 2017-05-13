@@ -11,7 +11,6 @@ import './App.css';
 import '../node_modules/codemirror/lib/codemirror.css';
 import * as SQL from 'sql.js';
 import InitDb from './InitDb';
-import Axios from 'axios';
 
 class App extends Component {
 
@@ -80,14 +79,12 @@ class App extends Component {
     this.toggleAudioRecording();
     console.log('start mouse recording');
     this.setState({recording:true});
-    Axios.get('http://localhost:3001/record/start');
   }
 
   stopRecording() {
     console.log('stop mouse recording');
     this.setState({recording:false});
     this.toggleAudioRecording();
-    Axios.get('http://localhost:3001/record/stop');
   }
 
   playRecording() {
@@ -174,11 +171,10 @@ class App extends Component {
       }
 
       <SimplerCodeMirror />
-      <Xterm recording={this.state.xtermRecording} playingBack={this.state.playingBack} />
-      <Button click={() => this.startRecording() } label={"Start recording"} />
-      <Button click={() => this.stopRecording()  } label={"Stop recording"} />
-      <Button click={() => this.playRecording()  } label={(this.state.playingBack ? 'Stop' : 'Start') + ' playback'} />
-      <Button click={() => this.toggleAudioRecording()  } label={(this.state.audioRecording ? 'Stop' : 'Start') + ' audio recording'} />
+      <Xterm recording={this.state.audioRecording} playingBack={this.state.playingBack} />
+      <Button click={() => {(this.state.audioRecording ? this.startRecording() : this.stopRecording() ) }} 
+        label={(this.state.audioRecording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square" ></i>) } />
+      <Button click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } />
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       }

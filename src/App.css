@@ -111,13 +111,13 @@
 
 #terminal-container {
   /*width: 90%;*/
-  height: 250px;
+  height: 200px;
   margin: 2px;
   padding: 2px;
 }
 
 #terminal-container .terminal {
-    background-color: #111;
-    color: #fafafa;
-    padding: 2px;
+  background-color: #555;
+  color: #fafafa;
+  padding: 2px;
 }

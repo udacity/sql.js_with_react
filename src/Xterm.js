@@ -1,7 +1,6 @@
 import Terminal from '../public/xterm.js';
 import '../public/addons/attach/attach.js';
 import '../public/addons/fit/fit.js';
-import Button from './Button';
 import React, { Component } from 'react';
 
 //require('../public/addons/attach/attach');
@@ -36,8 +35,21 @@ class Xterm extends Component {
     this.constructTerminal();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.recording !== nextProps.recording) {
+      if (nextProps.recording) {
+        this.resetRecording();
+      }
+    } else if (this.props.playingBack !== nextProps.playingBack) {
+      if (nextProps.playingBack) {
+        this.playRecording();
+      }
+    }
+  }
+  
   constructTerminal() {
     var terminalContainer = document.getElementById('terminal-container');
+    const host = this.getXtermHost();
 
     // Clean terminal
     while (terminalContainer.children.length) {
@@ -62,10 +74,6 @@ class Xterm extends Component {
     });
 
     this.term.open(terminalContainer, { focus: true } );
-
-    const host = this.getXtermHost();
-    fetch(`${host.httpHost}/terminal/history/reset`);
-
 
     this.term.viewport.viewportElement.addEventListener('scroll', function(e) {
       //console.log('scroll:', e);
@@ -94,6 +102,9 @@ class Xterm extends Component {
         this.socket = new WebSocket(socketUrl);
         this.socket.onopen = this.runRealTerminal;
       });
+
+    this.resetRecording();
+
   }
   
   runRealTerminal() {
@@ -103,9 +114,14 @@ class Xterm extends Component {
     this.term._initialized = true;
   }
 
+  resetRecording() {
+    const host = this.getXtermHost();
+    fetch(`${host.httpHost}/terminal/history/reset`);
+  }
+
   playHistory() {
     if (this.props.recording || this.state.history.length === 0) {
-      console.log('history done');
+      console.log('History done or recording started.');
       this.setState({recording:true});
       clearInterval(this.state.replayInterval);
     } else {
@@ -145,7 +161,6 @@ class Xterm extends Component {
     return  (
       <div>
         <div id="terminal-container"></div>
-        <Button click={() => this.playRecording()  } label={'Press play'} />
       </div>
     );
   } 

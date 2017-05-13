@@ -5,7 +5,7 @@ class Button extends Component {
   render() {
     return  (
       <span>
-      <button onClick={this.props.click} >{this.props.label}</button>  
+      <button disabled={this.props.disabled} onClick={this.props.click} >{this.props.label}</button>  
       </span>
     );
   } 

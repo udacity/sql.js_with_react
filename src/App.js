@@ -17,40 +17,23 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    var inlineDb = false;
-    if (inlineDb) {
-      this.state = {
-        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
-        db: new SQL.Database(),
-        remoteDbFile: undefined,
-        inlineDb: true,     // set this to true if queries can run as soon as the user types something
-        recording: false,
-        cursorMotion: [],
-        cursorMotionIndex: 1,
-        playingBack: false,
-        audioRecording: false,
-        audioPlayingBack: false,
-        audioUrl: '',
-        lastPlayMarker: 0,
-        xtermRecording: false
-      };
-    } else {
-      this.state = {
-        newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
-        db: undefined,
-        remoteDbFile: 'parch_and_posey_4_20_17a.db',
-        inlineDb: false,     // set this to true if queries can run as soon as the user types something
-        recording: false,
-        cursorMotion: [],
-        cursorMotionIndex: 1,
-        playingBack: false,
-        audioRecording: false,
-        audioPlayingBack: false,
-        audioUrl: '',
-        lastPlayMarker: 0,
-        xtermRecording: false
-      };
-    }
+    this.state = {
+      inlineDb: props.inlineDb, 
+      newUserQuery: "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;",
+      db: (props.inlineDb ? new SQL.Database() : undefined),
+      remoteDbFile: (props.inlineDb ? 'parch_and_posey_4_20_17a.db': undefined),
+      recording: false,
+      playingBack: false,
+      firstRecordingComplete: false,
+      cursorMotion: [],
+      cursorMotionIndex: 1,
+      audioRecording: false,
+      audioPlayingBack: false,
+      audioUrl: '',
+      lastPlayMarker: 0,
+      xtermRecording: false
+    };
+
     this.handleUserQuery = this.handleUserQuery.bind(this);
     this.loadDbHandler = this.loadDbHandler.bind(this);
     this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
@@ -74,41 +57,29 @@ class App extends Component {
   }
 
   startRecording() {
-    this.cursorMotionIndex = -1;
-    this.setState({cursorMotion: []});
-    this.toggleAudioRecording();
-    console.log('start mouse recording');
-    this.setState({recording:true});
+    this.setState({recording:true, firstRecordingComplete: true, cursorMotionIndex: -1, cursorMotion: []});
+    console.log('Recording started.');
   }
 
   stopRecording() {
-    console.log('stop mouse recording');
     this.setState({recording:false});
-    this.toggleAudioRecording();
+    console.log('Recording stopped.');
   }
 
   playRecording() {
-    console.log('play mouse and audio recording');
+    if (!this.state.firstRecordingComplete) {
+      return;
+    }
+    console.log('Playing recording');
     var now = new Date().getTime();
     this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, lastPlayMarker: now});
     this.state.audioObj.play();
   }
 
-  toggleAudioRecording() {
-    this.setState({audioRecording:!this.state.audioRecording});
-  }
-
-  toggleXtermRecording() {
-    this.setState({xtermRecording:!this.state.xtermRecording});
-  }
-  
   saveAudioForPlayback(audioObj) {
     this.setState({audioObj:audioObj});
   }
 
-  playAudioRecording() {
-  }
-  
   getPosition() {
     //console.log('app:getPosition');
     if (this.state.playingBack) {
@@ -129,7 +100,7 @@ class App extends Component {
         return(this.state.cursorMotion[this.state.cursorMotionIndex]);
       }
     }
-    return({x:0,y:0});
+    return({x:100,y:100});
   }
 
   loadDbHandler(uInt8Array) {
@@ -171,17 +142,14 @@ class App extends Component {
       }
 
       <SimplerCodeMirror />
-      <Xterm recording={this.state.audioRecording} playingBack={this.state.playingBack} />
-      <Button click={() => {(this.state.audioRecording ? this.stopRecording() : this.startRecording() ) }} 
-        label={(this.state.audioRecording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square" ></i>) } />
-      <Button click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } />
+      <Xterm recording={this.state.recording} playingBack={this.state.playingBack} />
+      <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
+      <Button click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
+      label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } />
+      <Button disabled={this.state.recording} click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } />
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       }
-      { 
-        // <asciinema-player src="/recording1.json"></asciinema-player> 
-      }
-      <RecordAudio audioRecording={this.state.audioRecording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       </div>
     );
   }

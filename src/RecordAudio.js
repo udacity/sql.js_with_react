@@ -5,7 +5,7 @@ class RecordAudio extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentlyRecording: false,
+      isRecording: false,
     }
     this.saveAudioForPlayback = props.saveAudioForPlayback;
   }
@@ -16,8 +16,8 @@ class RecordAudio extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.audioRecording !== this.state.currentlyRecording) {
-      if (nextProps.audioRecording) {
+    if (nextProps.recording !== this.state.isRecording) {
+      if (nextProps.recording) {
         this.startAudioRecording();
       } else {
         this.stopAudioRecording();
@@ -27,14 +27,14 @@ class RecordAudio extends Component {
 
   startAudioRecording() {
     this.state.mediaRecorder.start();
-    this.setState({currentlyRecording:true});
+    this.setState({isRecording:true});
     console.log(this.state.mediaRecorder.state);
     console.log("Audio recording started");
   }
 
   stopAudioRecording() {
     this.state.mediaRecorder.stop();
-    this.setState({currentlyRecording:false});
+    this.setState({isRecording:false});
     console.log(this.state.mediaRecorder.state);
     console.log("Audio recording stopped");
   }

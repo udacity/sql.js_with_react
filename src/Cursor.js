@@ -25,8 +25,7 @@ class Cursor extends Component {
       <FontAwesome name="cursor" className='fa-mouse-pointer cursor' 
       style={{
         left: this.state.position.x, 
-        top: this.state.position.y, 
-        textShadow: '0 1px 0 rgba(255, 255, 255, 0.1)'
+        top: this.state.position.y
       }} />
     );
   }

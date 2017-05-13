@@ -80,6 +80,8 @@
 .cursor {
   position: fixed;
   z-index:1000;
+  color:#fd5;
+  text-shadow:3px 2px #000;
   top: 0;
   left: 0;
 }
@@ -107,6 +109,10 @@
 }
 
 .termText {
+}
+
+.record-button {
+  color:red;
 }
 
 #terminal-container {

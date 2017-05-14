@@ -30,30 +30,13 @@ class App extends Component {
       audioRecording: false,
       audioPlayingBack: false,
       audioUrl: '',
-      lastPlayMarker: 0,
-      xtermRecording: false
+      xtermRecording: false,
+      node: this.node
     };
 
     this.handleUserQuery = this.handleUserQuery.bind(this);
     this.loadDbHandler = this.loadDbHandler.bind(this);
     this.saveUserQueryForEvaluator = this.saveUserQueryForEvaluator.bind(this);
-  }
-
-  componentDidMount() {
-    this.registerCursorMotion();
-  }
-
-  registerCursorMotion() {
-    this.cursorMotion = [];
-    this.node.onmousemove = (e) => this.recordCursorMotion(e);
-  }
-
-  recordCursorMotion(e) {
-    if (this.state.recording) {
-      var now = new Date().getTime();
-      var cursorPos = { x: e.pageX, y: e.pageY, t: now };
-      this.setState({cursorMotion:[...this.state.cursorMotion, cursorPos]});
-    }
   }
 
   startRecording() {
@@ -70,9 +53,8 @@ class App extends Component {
     if (!this.state.firstRecordingComplete) {
       return;
     }
-    console.log('Playing recording');
-    var now = new Date().getTime();
-    this.setState({recording:false, playingBack:!this.state.playingBack, cursorMotionIndex: 1, lastPlayMarker: now});
+    console.log('Playing recording.');
+    this.setState({recording:false, playingBack: true});
     this.state.audioObj.play();
   }
 
@@ -80,28 +62,6 @@ class App extends Component {
     this.setState({audioObj:audioObj});
   }
 
-  getPosition() {
-    //console.log('app:getPosition');
-    if (this.state.playingBack) {
-      if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length)) {
-        var now = new Date().getTime();
-        //console.log('sending position back');
-        var lastSpot = this.state.cursorMotion[this.state.cursorMotionIndex - 1];
-        var thisSpot = this.state.cursorMotion[this.state.cursorMotionIndex];
-        if (thisSpot.t - lastSpot.t < now - this.state.lastPlayMarker) {
-          var checkState = this.state.cursorMotionIndex + 1;
-          this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, lastPlayMarker: now});
-          if (checkState >= this.state.cursorMotion.length) {
-            this.setState({playingBack:false});
-            console.log('stopped playback');
-            return({x:0, y:0});
-          }
-        }
-        return(this.state.cursorMotion[this.state.cursorMotionIndex]);
-      }
-    }
-    return({x:100,y:100});
-  }
 
   loadDbHandler(uInt8Array) {
     this.setState({db: new SQL.Database(uInt8Array)});;
@@ -133,10 +93,10 @@ class App extends Component {
           </div>
           : null
         }
-      <Cursor id="cursor" getPosition={() => this.getPosition() } / >
+      <Cursor id="cursor" recording={this.state.recording} playingBack={this.state.playingBack} />
       <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
       {
-//        <p className="App-intro"></p>
+        //        <p className="App-intro"></p>
         //      <SQLText saveUserQueryForEvaluator={this.saveUserQueryForEvaluator} handleUserQuery={this.handleUserQuery} inlineDb={this.state.inlineDb} query={this.state.newUserQuery}/>
         // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
       }
@@ -145,8 +105,8 @@ class App extends Component {
       <Xterm recording={this.state.recording} playingBack={this.state.playingBack} />
       <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       <Button click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
-      label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } />
-      <Button disabled={this.state.recording} click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } />
+              label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } title={`Make Recording`}/>
+      <Button disabled={this.state.recording} click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } title={`Play back recording`}/>
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       }

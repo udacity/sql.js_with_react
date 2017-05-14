@@ -91,8 +91,9 @@ class Xterm extends Component {
     });
 
     var cols = 125;
+    var rows = 24;
 
-    fetch(`${host.httpHost}/terminals?cols=${cols}`, {method: 'POST'})
+    fetch(`${host.httpHost}/terminals?cols=${cols}&rows=${rows}`, {method: 'POST'})
       .then(res => res.text()).then((pid) => { 
         this.term.fit();
         this.setState({pid: pid});

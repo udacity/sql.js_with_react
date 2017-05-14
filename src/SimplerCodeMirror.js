@@ -33,6 +33,8 @@ class SimplerCodeMirror extends Component {
     //cm.setCursor({line:2, ch:2});
     var history = cm.getHistory();
     console.log('history:', history);
+    var bigJs = "// This is a for loop in Javascript\n// Here's somre more comments\n// And even more comments\n// Wowo\nfor (var i = 0; i < 10; ++i) {\n  console.log(i);\n}\n"
+    window.cm = cm;
   }
 
   handleCursorActivity(cm) {

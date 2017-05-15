@@ -90,8 +90,9 @@ class Xterm extends Component {
       });
     });
 
-    var cols = 125;
-    var rows = 24;
+    var initialGeometry = this.term.proposeGeometry();
+    var cols = initialGeometry.cols
+    var rows = initialGeometry.rows;
 
     fetch(`${host.httpHost}/terminals?cols=${cols}&rows=${rows}`, {method: 'POST'})
       .then(res => res.text()).then((pid) => { 

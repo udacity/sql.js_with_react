@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Button from './Button';
 import Cursor from './Cursor';
 import RecordAudio from './RecordAudio';
+import HistoryControl from './HistoryControl';
 //import SQLOutput from './SQLOutput';
 //import SQLText from './SqlText';
 import SimplerCodeMirror from './SimplerCodeMirror';
@@ -103,6 +104,7 @@ class App extends Component {
 
       <SimplerCodeMirror />
       <Xterm recording={this.state.recording} playingBack={this.state.playingBack} />
+      <HistoryControl />
       <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       <Button click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
               label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } title={`Make Recording`}/>

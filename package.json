@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.16.1",
     "pg": "^6.1.5",
+    "range-input-react": "0.0.3",
     "react": "^15.5.4",
     "react-codemirror": "^0.3.0",
     "react-dom": "^15.5.4",

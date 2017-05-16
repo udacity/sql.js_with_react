@@ -117,7 +117,7 @@
 
 #terminal-container {
   /*width: 90%;*/
-  height: 336px;
+  height: 236px;
   margin: 2px;
   padding: 2px;
   font-size:14px;
@@ -129,3 +129,9 @@
   color: #fafafa;
   padding: 2px;
 }
+
+.scrubber {
+  width:99.5%;
+  display:block;
+}
+

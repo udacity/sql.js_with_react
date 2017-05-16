@@ -14,12 +14,13 @@ class HistoryControl extends Component {
 
   handleOnChange = (e) => {
     var value = Number(e.target.value);
+    var time;
     if (value === this.state.maxRange) {
-      var time = this.state.duration;
+      time = this.state.duration;
     } else if (value === 0) {
-      var time = 0;
+      time = 0;
     } else {
-      var time = (value / this.state.maxRange) * this.state.duration;
+      time = (value / this.state.maxRange) * this.state.duration;
     }
     console.log('Value:', value, ' Slider time:', time);
     this.setState({

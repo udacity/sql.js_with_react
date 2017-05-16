@@ -111,8 +111,7 @@ class Xterm extends Component {
   
   runRealTerminal() {
     console.log('attaching...');
-    var results = this.term.attach(this.socket);
-    console.log('results:', results);
+    this.term.attach(this.socket);
     this.term._initialized = true;
   }
 
@@ -154,7 +153,7 @@ class Xterm extends Component {
       .then(data => { 
         this.term.viewport.viewportElement.click();
         this.term.reset();
-        console.log('Got history:', data);
+        //console.log('Got history:', data);
         this.setState({history: data, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
       });
   }

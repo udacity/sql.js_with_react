@@ -20,8 +20,14 @@ class Cursor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.playingBack !== this.props.playingBack) {
-      this.startPlayback();
+    if (this.props.recording !== nextProps.recording) {
+      if (nextProps.recording) {
+        this.setState({cursorMotion:[]}); // reset cursor recording
+      }
+    } else if (nextProps.playingBack !== this.props.playingBack) {
+      if (nextProps.playingBack) {
+        this.startPlayback();
+      }
     }
   }
 
@@ -34,7 +40,7 @@ class Cursor extends Component {
   }
 
   getPosition() {
-    if (this.props.playingBack) {
+    if (this.state.playingBack) {
       console.log('getPosition');
       if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length)) {
         var now = new Date().getTime();
@@ -58,7 +64,7 @@ class Cursor extends Component {
 
   startPlayback() {
     var now = new Date().getTime();
-    this.setState({cursorMotionIndex: 1, lastPlayMarker: now});
+    this.setState( {playingBack:true, cursorMotionIndex: 1, lastPlayMarker: now});
     var playbackEventFn = () => {
       //console.log('playback event fired.');
       this.setState({position: this.getPosition()});

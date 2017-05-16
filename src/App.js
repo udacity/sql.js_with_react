@@ -32,7 +32,7 @@ class App extends Component {
       audioPlayingBack: false,
       audioUrl: '',
       xtermRecording: false,
-      node: this.node
+      cmOptions: { historyEventDelay: 50 }
     };
 
     this.handleUserQuery = this.handleUserQuery.bind(this);
@@ -102,13 +102,14 @@ class App extends Component {
         // <Button click={() => this.sqlEvaluator()   } label={"Evaluate SQL (Ctrl-Enter)"} />
       }
 
-      <SimplerCodeMirror />
+      <Button click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
+      label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } title={`Make Recording`}/>
+      <Button disabled={this.state.recording} click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } title={`Play back recording`}/>
+
+      <SimplerCodeMirror recording={this.state.recording} playingBack={this.state.playingBack} options={this.state.cmOptions}/>
       <Xterm recording={this.state.recording} playingBack={this.state.playingBack} />
       <HistoryControl />
       <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
-      <Button click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
-              label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } title={`Make Recording`}/>
-      <Button disabled={this.state.recording} click={() => this.playRecording()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } title={`Play back recording`}/>
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
       }

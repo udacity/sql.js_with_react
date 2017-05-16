@@ -29,18 +29,18 @@ class RecordAudio extends Component {
     this.state.mediaRecorder.start();
     this.setState({isRecording:true});
     console.log(this.state.mediaRecorder.state);
-    console.log("Audio recording started");
+    //console.log("Audio recording started");
   }
 
   stopAudioRecording() {
     this.state.mediaRecorder.stop();
     this.setState({isRecording:false});
     console.log(this.state.mediaRecorder.state);
-    console.log("Audio recording stopped");
+    //console.log("Audio recording stopped");
   }
 
   saveRecordedAudio(e) {
-    console.log("data available");
+    //console.log("Audio data available");
 
     var audioUrl = window.URL.createObjectURL(e.data);
     // This works so nice and simple. From: http://stackoverflow.com/questions/33755524/how-to-load-audio-completely-before-playing (first answer)

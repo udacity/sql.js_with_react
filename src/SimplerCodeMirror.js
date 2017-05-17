@@ -10,7 +10,7 @@ class SimplerCodeMirror extends Component {
     this.findDOMNode = this.ReactDOM.findDOMNode;
     this.cm = 1;
     this.state = {
-      cmHistory: [],
+      history: [],
       lastPlayMarker: 0,
       changeCount: 0,
       exampleJs: '// loading... '
@@ -29,10 +29,12 @@ class SimplerCodeMirror extends Component {
       .then(data => {
         var textAreaNode = this.findDOMNode(this.refs.textarea);
         this.cm = this.CodeMirror.fromTextArea(textAreaNode, this.props.options);
-        //this.cm.setValue(data);
+        this.cm.setValue(data);
         this.cm.on('change', this.handleChange);
         this.cm.on('cursorActivity', this.handleCursorActivity);
         this.cm.on('scroll', this.handleScroll);
+        window.cm = this.cm;
+        window.cm.focus(); 
         var cursorInfo = this.cm.getCursor();
         console.log('at startup, cursorInfo:', cursorInfo);
       });
@@ -53,51 +55,98 @@ class SimplerCodeMirror extends Component {
   }
 
   stopRecording() {
-    var cmHistory = this.cm.getHistory();
-    //cmHistory.done.shift(); // remove first replacement of cm contents before storing history as "undone"
-    //cmHistory.done.shift();
-    cmHistory.done.reverse();
-    cmHistory.undone.reverse();
-    var reversedHistory = { done: cmHistory.undone, undone: cmHistory.done }; // save recording but as redo steps so that we can play it back
+    var history = this.cm.getHistory();
+    //history.done.shift(); // remove first replacement of cm contents before storing history as "undone"
+    //history.done.shift();
+    history.done.reverse();
+    history.undone.reverse();
+    var reversedHistory = { done: history.undone, undone: history.done }; // save recording but as redo steps so that we can play it back
     this.setState( { playbackHistory: reversedHistory });
   }
   
   startRecording() {
     var initialCmContents = this.cm.getValue(); // save the editor contents right when we start recording so we can play back changes
-    this.setState({ cmHistory: [], initialCmContents: initialCmContents });
+    var now = new Date().getTime();
+    this.setState({ history: [], initialCmContents: initialCmContents, recordingStartTime: now });
   }
 
+  playHistory = () => {
+    if (this.props.recording || this.state.history.length === 0) {
+      console.log('History done or recording started.');
+      clearInterval(this.state.replayInterval);
+      this.cm.setOption("readOnly", false );
+    } else {
+      var nextAction = this.state.history[0];
+      var timeDiff = new Date().getTime() - this.state.replayStartTime;
+      if (timeDiff > nextAction.timeOffset) {
+        var historyItem = this.state.history[0];
+        this.setState({history: this.state.history.splice(1,this.state.history.length - 1)});
+        window.cm.focus();
+        switch(historyItem.type) {
+          case 'change':
+            console.log('change history during playback:',historyItem);
+            this.cm.redo();
+            break;
+          case 'cursorActivity':
+            console.log('cm cursor activity during playback: ', historyItem.record);
+            if (historyItem.record.position !== undefined) {
+              this.cm.setCursor({line: historyItem.record.position.line, ch: historyItem.record.position.ch});
+            }
+            break;
+          case 'scroll':
+            console.log('cm scroll activity during playback:', historyItem.record);
+            this.cm.scrollIntoView({ 
+              left: historyItem.record.left,
+              top: historyItem.record.top,
+              right: historyItem.record.left + historyItem.record.clientWidth,
+              bottom: historyItem.record.top + historyItem.record.clientHeight
+            });
+            break;
+          case 'selection':
+            console.log('cm selection activity during playback:', historyItem.record);
+            
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+  
   playbackRecording() {
     console.log('Before running redos, we have history:', this.cm.getHistory());
-    this.cm.setValue(this.state.initialCmContents);
-    this.cm.clearHistory();
-    console.log('Going to use this playbackHistory:', this.state.playbackHistory);
-    this.cm.setHistory(this.state.playbackHistory);
     console.log('changeCount = ', this.state.changeCount);
-/*
-    for (var i = 0; i < this.state.changeCount; ++i) {
+
+    console.log('undoing all changes.');
+    var correctedChangeCount = this.state.changeCount - 1;
+    for (var i = 0; i < correctedChangeCount + 1; ++i) {
       console.log('doing undo number:', i);
       this.cm.undo();
     }
-*/
-    for (var j = 0; j < this.state.changeCount; ++j) {
-      console.log('doing redo number:', j);
-      this.cm.redo();
-    }
+    this.cm.redo();
+    this.cm.setOption("readOnly",  true );
+
+    console.log('replaying changes at correct speed');
+    this.setState({replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
   }
 
-  recordAction(cm, action) {
+  recordAction = (cm, action) => {
     var history = cm.getHistory();
     if (this.props.recording) {
       console.log('recordAction: action:', action, 'history:', history.done.length);
-      var now = new Date().getTime();
-      var cmHistoryItem = {
+      var timeOffset = new Date().getTime() - this.state.recordingStartTime;
+      var historyItem = {
         type: action.type,
         record: action.record,
-        t: now
+        timeOffset: timeOffset
       }
-      console.log('Recording cm history:', cmHistoryItem);
-      this.setState({cmHistory: [...this.state.cmHistory, cmHistoryItem]});
+      console.log('Recording codemirror history:', historyItem);
+      if ((this.state.lastActionType !== undefined) && (this.state.lastActionType === 'change') && (action.type == 'cursorActivity')) {
+        console.log('Not logging cursor activity due to change');
+      } else {
+        this.setState({history: [...this.state.history, historyItem]});
+      }
+      this.setState({lastActionType: action.type});
     }
   }
   
@@ -110,7 +159,6 @@ class SimplerCodeMirror extends Component {
     //console.log('onchange, history:', history);
     // var bigJs = "// This is a for loop in Javascript\n// Here's somre more comments\n// And even more comments\n// Wowo\nfor (var i = 0; i < 10; ++i) {\n  console.log(i);\n}\n"
     //console.log('recording =', this.props.recording);
-    window.cm = cm;
     this.setState({changeCount: this.state.changeCount + 1});
     this.recordAction(cm,{ type: 'change', record: {} });
   }
@@ -120,21 +168,26 @@ class SimplerCodeMirror extends Component {
     //console.log('Cursor activity:', cursorPos);
     //var history = cm.getHistory();
     //console.log('cursor activity, history:', history);
-    this.recordAction(cm, { type: 'cursorActivity', record: { position: cm.getCursor() }});;
     var orderTwo = function(a,b) { return( a <= b ? [a,b] : [b,a]) };
     var selections = cm.listSelections();
     for (var selection of selections) {
       var minMaxCh = orderTwo(selection.anchor.ch,selection.head.ch);
       var minMaxLine = orderTwo(selection.anchor.line,selection.head.line);
       var selectionLength = Math.abs(minMaxCh[1] - minMaxCh[0]);
-      if (selectionLength > 0) {
+      console.log('selectionLength:', selectionLength);
+      if (selectionLength === 0) {
+        this.recordAction(cm, { type: 'cursorActivity', record: { position: cm.getCursor() }});;
+      } else {
+        this.recordAction(cm, { type: 'selection', record: { line: minMaxLine, ch: minMaxCh }});;
         console.log('Selected:', minMaxLine[0], ':', minMaxCh[0], 'to', minMaxLine[1], ':', minMaxCh[1]);
       }
     }
   }
   
-  handleScroll(cm,action) {
+  handleScroll = (cm,action) => {
     console.log('scrolled',action);
+    var scrollRecord = cm.getScrollInfo();
+    this.recordAction(cm, { type: 'scroll', record: scrollRecord });;
   }
 
   render() {

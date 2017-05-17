@@ -41,7 +41,7 @@ class Cursor extends Component {
 
   getPosition() {
     if (this.state.playingBack) {
-      console.log('getPosition');
+      //console.log('getPosition');
       if ((this.state.cursorMotion.length > 0) && (this.state.cursorMotionIndex < this.state.cursorMotion.length)) {
         var now = new Date().getTime();
         //console.log('sending position back');

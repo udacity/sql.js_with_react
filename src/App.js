@@ -30,7 +30,6 @@ class App extends Component {
       cursorMotionIndex: 1,
       audioRecording: false,
       audioPlayingBack: false,
-      audioUrl: '',
       xtermRecording: false,
       cmOptions: { historyEventDelay: 50 }
     };
@@ -59,6 +58,10 @@ class App extends Component {
     this.state.audioObj.play();
   }
 
+  endAllPlayback = () => {
+    this.setState({playingBack: false});
+  }
+  
   saveAudioForPlayback(audioObj) {
     this.setState({audioObj:audioObj});
   }
@@ -94,7 +97,7 @@ class App extends Component {
           </div>
           : null
         }
-      <Cursor id="cursor" recording={this.state.recording} playingBack={this.state.playingBack} />
+      <Cursor id="cursor" recording={this.state.recording} playingBack={this.state.playingBack} endAllPlayback={this.endAllPlayback} />
       <InitDb db={this.state.db} inlineDb={this.state.inlineDb} loadDbHandler={this.loadDbHandler} remoteDbFile={this.state.remoteDbFile} />
       {
         //        <p className="App-intro"></p>

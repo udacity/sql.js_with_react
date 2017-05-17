@@ -81,46 +81,57 @@ class SimplerCodeMirror extends Component {
   }
 
   playHistory = () => {
-    if (this.props.recording || this.state.history.length === 0) {
+    if (this.props.recording || this.state.lastPlayMarker === this.state.history.length) {
       console.log('History done or recording started.');
       clearInterval(this.state.replayInterval);
       this.cm.setOption("readOnly", false );
     } else {
-      var nextAction = this.state.history[0];
-      var timeDiff = new Date().getTime() - this.state.replayStartTime;
-      if (timeDiff > nextAction.timeOffset) {
-        var historyItem = this.state.history[0];
-        this.setState({history: this.state.history.splice(1,this.state.history.length - 1)});
-        window.cm.focus();
-        switch(historyItem.type) {
-          case 'change':
-            console.log('change history during playback:',historyItem);
-            this.cm.redo();
-            break;
-          case 'cursorActivity':
-            console.log('cm cursor activity during playback: ', historyItem.record);
-            if (historyItem.record.position !== undefined) {
-              this.cm.setCursor({line: historyItem.record.position.line, ch: historyItem.record.position.ch});
-            }
-            break;
-          case 'scroll':
-            console.log('cm scroll activity during playback:', historyItem.record);
-            this.cm.scrollIntoView({ 
-              left: historyItem.record.left,
-              top: historyItem.record.top,
-              right: historyItem.record.left + historyItem.record.clientWidth,
-              bottom: historyItem.record.top + historyItem.record.clientHeight
-            });
-            break;
-          case 'selection':
-            console.log('cm selection activity during playback:', historyItem.record);
-            this.cm.setSelection( 
-              { ch: historyItem.record.ch[0], line: historyItem.record.line[0] },
-              { ch: historyItem.record.ch[1], line: historyItem.record.line[1] }
-            );
-            break;
-          default:
-            break;
+      if (this.correctedChangeCount > 0) {
+        console.log('doing undo number:', this.correctedChangeCount);
+        this.cm.undo();
+        this.correctedChangeCount--;
+        if (this.correctedChangeCount === 0) {
+          this.cm.redo();
+          clearInterval(this.state.replayInterval);
+          this.setState({replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
+        }
+      } else {
+        var nextAction = this.state.history[this.state.lastPlayMarker];
+        var timeDiff = new Date().getTime() - this.state.replayStartTime;
+        if (timeDiff > nextAction.timeOffset) {
+          var historyItem = this.state.history[this.state.lastPlayMarker];
+          this.setState({lastPlayMarker : this.state.lastPlayMarker + 1});
+          window.cm.focus();
+          switch(historyItem.type) {
+            case 'change':
+              //console.log('change history during playback:',historyItem);
+              this.cm.redo();
+              break;
+            case 'cursorActivity':
+              //console.log('cm cursor activity during playback: ', historyItem.record);
+              if (historyItem.record.position !== undefined) {
+                this.cm.setCursor({line: historyItem.record.position.line, ch: historyItem.record.position.ch});
+              }
+              break;
+            case 'scroll':
+              //console.log('cm scroll activity during playback:', historyItem.record);
+              this.cm.scrollIntoView({ 
+                left: historyItem.record.left,
+                top: historyItem.record.top,
+                right: historyItem.record.left + historyItem.record.clientWidth,
+                bottom: historyItem.record.top + historyItem.record.clientHeight
+              });
+              break;
+            case 'selection':
+              console.log('cm selection activity during playback:', historyItem.record);
+              this.cm.setSelection( 
+                { ch: historyItem.record.ch[0], line: historyItem.record.line[0] },
+                { ch: historyItem.record.ch[1], line: historyItem.record.line[1] }
+              );
+              break;
+            default:
+              break;
+          }
         }
       }
     }
@@ -131,17 +142,12 @@ class SimplerCodeMirror extends Component {
     console.log('changeCount = ', this.state.changeCount);
 
     console.log('undoing all changes.');
-    var correctedChangeCount = this.state.changeCount - 1;
-    for (var i = 0; i < correctedChangeCount + 1; ++i) {
-      console.log('doing undo number:', i);
-      this.cm.undo();
-    }
-    this.cm.redo();
+    this.correctedChangeCount = this.state.changeCount + 1;
     this.cm.setOption("readOnly",  true );
 
     console.log('replaying changes at correct speed');
     this.cm.setCursor(this.state.initialCursorPos);
-//    this.setState({replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
+    this.setState({replayInterval: setInterval(this.playHistory, 1), lastPlayMarker: 0 });
   }
 
   recordAction = (cm, action) => {

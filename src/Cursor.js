@@ -52,7 +52,8 @@ class Cursor extends Component {
           this.setState({cursorMotionIndex: this.state.cursorMotionIndex + 1, lastPlayMarker: now});
           if (checkState >= this.state.cursorMotion.length) {
             this.setState({playingBack:false});
-            console.log('stopped playback');
+            this.props.endAllPlayback();
+            console.log('Stopped cursor playback');
             return({x:0, y:0});
           }
         }

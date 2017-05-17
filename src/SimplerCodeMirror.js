@@ -67,7 +67,17 @@ class SimplerCodeMirror extends Component {
   startRecording() {
     var initialCmContents = this.cm.getValue(); // save the editor contents right when we start recording so we can play back changes
     var now = new Date().getTime();
-    this.setState({ history: [], initialCmContents: initialCmContents, recordingStartTime: now });
+    this.cm.focus();
+    var selection = this.cm.getSelection();
+    var initialCursorPos;
+    if (selection.length > 0) {
+      var selections = this.cm.listSelections();
+      initialCursorPos = { line: selections[0].anchor.line, ch: selections[0].anchor.ch };
+      this.cm.setCursor(initialCursorPos);
+    } else {
+      initialCursorPos = this.cm.getCursor();
+    }
+    this.setState({ history: [], initialCmContents: initialCmContents, initialCursorPos: initialCursorPos, recordingStartTime: now });
   }
 
   playHistory = () => {
@@ -104,7 +114,10 @@ class SimplerCodeMirror extends Component {
             break;
           case 'selection':
             console.log('cm selection activity during playback:', historyItem.record);
-            
+            this.cm.setSelection( 
+              { ch: historyItem.record.ch[0], line: historyItem.record.line[0] },
+              { ch: historyItem.record.ch[1], line: historyItem.record.line[1] }
+            );
             break;
           default:
             break;
@@ -127,7 +140,8 @@ class SimplerCodeMirror extends Component {
     this.cm.setOption("readOnly",  true );
 
     console.log('replaying changes at correct speed');
-    this.setState({replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
+    this.cm.setCursor(this.state.initialCursorPos);
+//    this.setState({replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
   }
 
   recordAction = (cm, action) => {
@@ -141,7 +155,7 @@ class SimplerCodeMirror extends Component {
         timeOffset: timeOffset
       }
       console.log('Recording codemirror history:', historyItem);
-      if ((this.state.lastActionType !== undefined) && (this.state.lastActionType === 'change') && (action.type == 'cursorActivity')) {
+      if ((this.state.lastActionType !== undefined) && (this.state.lastActionType === 'change') && (action.type === 'cursorActivity')) {
         console.log('Not logging cursor activity due to change');
       } else {
         this.setState({history: [...this.state.history, historyItem]});

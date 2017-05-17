@@ -115,12 +115,7 @@ class SimplerCodeMirror extends Component {
               break;
             case 'scroll':
               //console.log('cm scroll activity during playback:', historyItem.record);
-              this.cm.scrollIntoView({ 
-                left: historyItem.record.left,
-                top: historyItem.record.top,
-                right: historyItem.record.left + historyItem.record.clientWidth,
-                bottom: historyItem.record.top + historyItem.record.clientHeight
-              });
+              this.cm.scrollTo(historyItem.record.left,historyItem.record.top);
               break;
             case 'selection':
               console.log('cm selection activity during playback:', historyItem.record);

@@ -1,3 +1,13 @@
+// TODO:
+// Rewindable time scrubber
+// Recording is additive, but you can reset the whole thing
+// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast
+// Tab panels
+// https://github.com/reactjs/react-tabs/blob/master/README.md
+// React preview window
+// Some way to record DevTools and possibly interactions with the student React App
+
+
 import React, { Component } from 'react';
 import Button from './Button';
 import Cursor from './Cursor';
@@ -31,6 +41,7 @@ class App extends Component {
       audioRecording: false,
       audioPlayingBack: false,
       xtermRecording: false,
+      currentTime: 0,
       cmOptions: { historyEventDelay: 50 }
     };
 
@@ -54,12 +65,18 @@ class App extends Component {
       return;
     }
     console.log('Playing recording.');
-    this.setState({recording:false, playingBack: true});
+    this.setState({recording:false, playingBack: true, playbackTimer: setInterval(this.updatePlaybackTimer, 100) });
     this.state.audioObj.play();
   }
 
+  updatePlaybackTimer = () => {
+    this.updateTime(this.state.currentTime + 1);
+  }
+
   endAllPlayback = () => {
+    console.log('endAllPlayback');
     this.setState({playingBack: false});
+    clearInterval(this.state.playbackTimer);
   }
   
   saveAudioForPlayback(audioObj) {
@@ -84,6 +101,11 @@ class App extends Component {
 
   sqlEvaluator() {
     this.setState({userQuery: this.state.newUserQuery});
+  }
+
+  updateTime = (newTime) => {
+    this.setState({currentTime: newTime});
+    console.log('app.js: set currentTime=', newTime);
   }
 
   render() {
@@ -111,7 +133,7 @@ class App extends Component {
 
       <SimplerCodeMirror recording={this.state.recording} playingBack={this.state.playingBack} options={this.state.cmOptions}/>
       <Xterm recording={this.state.recording} playingBack={this.state.playingBack} />
-      <HistoryControl />
+      <HistoryControl updateTime={this.updateTime} newTime={this.state.currentTime} />
       <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       {
         //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>

@@ -12,6 +12,12 @@ class HistoryControl extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.state.currentTime !== nextProps.newTime) {
+      this.setState({currentTime: nextProps.newTime});
+    }
+  }
+
   handleOnChange = (e) => {
     var value = Number(e.target.value);
     var time;
@@ -25,7 +31,8 @@ class HistoryControl extends Component {
     console.log('Value:', value, ' Slider time:', time);
     this.setState({
       currentTime: value
-    })
+    });
+    this.props.updateTime(value);
   }
 
   render() {

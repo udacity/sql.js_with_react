@@ -44,12 +44,12 @@ class App extends Component {
     console.log('stopPlayback');
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
-    var newFarthestPointReached = this.state.playbackInfo.farthestPointReached + playedBackThisTime;
+    var newFarthestPointReached = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     const newState = update(this.state, {
       mode: { $set: 'configuration' },
       playbackInfo: { 
         $merge: {
-          farthestPointReached: newFarthestPointReached
+          furthestPointReached: newFarthestPointReached
         }
       }
     });
@@ -64,7 +64,7 @@ class App extends Component {
     const newState = update(this.state, {
       playbackInfo: { 
         $merge: {
-          farthestPointReached: 0
+          furthestPointReached: 0
         }
       }
     });
@@ -99,7 +99,7 @@ class App extends Component {
         duration: duration
       }},
       playbackInfo: { $merge: {
-        farthestPointReached: 0
+        furthestPointReached: 0
       }}                       
     });
     this.setState(newState);
@@ -134,10 +134,10 @@ class App extends Component {
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
-    var totalPlayedBack = this.state.playbackInfo.farthestPointReached + playedBackThisTime;
+    var totalPlayedBack = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     var newSliderValue = (( totalPlayedBack / this.state.recordingInfo.duration) * 1000);
     this.updateSlider(newSliderValue);
-    if (totalPlayedBack >= this.state.recordingInfo.duration) {
+    if (totalPlayedBack >= this.state.recordingInfo.duration + 1000) {
       console.log('Ending playback from updatePlaybackTimer');
       this.stopAndResetPlayback();
     }

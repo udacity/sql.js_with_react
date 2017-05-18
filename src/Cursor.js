@@ -68,6 +68,7 @@ class Cursor extends Component {
 
   getPosition = () => {
     if ((this.cursorMotion.length > 0) && (this.cursorMotionIndex < this.cursorMotion.length)) {
+      //console.log('Cursor motion index:', this.cursorMotionIndex);
       return(this.cursorMotion[this.cursorMotionIndex++]);
     }
 
@@ -81,12 +82,11 @@ class Cursor extends Component {
   }
 
   startPlayback() {
-    this.setState( {playingBack:true, playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
+    this.setState( { playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
   }
   
   stopPlayback = () => {
     clearInterval(this.state.playbackInterval);
-    this.setState({playingBack:false});
   }
 
   render() {

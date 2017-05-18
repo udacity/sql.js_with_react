@@ -82,7 +82,7 @@ class App extends Component {
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
     var currentPosition = now - this.state.playbackStartTime;
-    var newSliderValue = (( currentPosition / this.state.recordingDuration) * 1000) + 1;
+    var newSliderValue = (( currentPosition / this.state.recordingDuration) * 1000);
     this.updateSlider(newSliderValue);
     if (currentPosition >= this.state.recordingDuration + 1000) {
       console.log('ending playback from updatePlaybackTimer');

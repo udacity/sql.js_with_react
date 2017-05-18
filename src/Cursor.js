@@ -6,11 +6,11 @@ class Cursor extends Component {
     super(props);
     this.state = {
       position: { x : 0, y : 0 },
-      cursorMotion: [],
     }
-    this.cursorMotionIndex = 1;
-    this.cursorPosition = { x: 0, y: 0 };
-    this.lastPlayMarker = 0;
+    this.recordInterval = undefined;
+    this.cursorMotion = undefined;
+    this.cursorMotionIndex = 0;
+    this.cursorPosition = { x: 100, y: 100 };
     this.recordingSpeed = 10; // ms
   }
 
@@ -42,40 +42,27 @@ class Cursor extends Component {
 
 
   startRecording() {
-    this.setState({cursorMotion:[], recordInterval: setInterval(this.recordCursorMotion, this.recordingSpeed) } );
+    this.cursorMotion = [];
+    this.recordInterval = setInterval(this.recordCursorMotion, this.recordingSpeed);
   }
 
   stopRecording() {
-    clearInterval(this.state.recordInterval);
+    clearInterval(this.recordInterval);
+    console.log('Stopped cursor playback, array size:', this.cursorMotion.length, 'contents of the array:', this.cursorMotion);
   }
 
   recordCursorMotion = (e) => {
-    var now = new Date().getTime();
-    var newPosition = { x: this.cursorPosition.x, y: this.cursorPosition.y, t: now };
-    this.setState({cursorMotion:[...this.state.cursorMotion, newPosition]});
+    this.cursorMotion.push(this.cursorPosition);
   }
 
   getPosition = () => {
-    if (this.state.playingBack) {
-      if ((this.state.cursorMotion.length > 0) && (this.cursorMotionIndex < this.state.cursorMotion.length)) {
-        var now = new Date().getTime();
-        //console.log('sending position back');
-        var lastSpot = this.state.cursorMotion[this.cursorMotionIndex - 1];
-        var thisSpot = this.state.cursorMotion[this.cursorMotionIndex];
-        if (thisSpot.t - lastSpot.t < now - this.lastPlayMarker) {
-          var checkState = this.cursorMotionIndex + 1;
-          this.cursorMotionIndex++;
-          this.lastPlayMarker = now;
-          if (checkState >= this.state.cursorMotion.length) {
-            this.cursorMotionIndex = 1; // start cursor play over again
-            this.stopPlayback();
-            return({x:0, y:0});
-          }
-        }
-        return(this.state.cursorMotion[this.cursorMotionIndex]);
-      }
+    if ((this.cursorMotion.length > 0) && (this.cursorMotionIndex < this.cursorMotion.length)) {
+      return(this.cursorMotion[this.cursorMotionIndex++]);
     }
-    return({x:100,y:100});
+
+    this.stopPlayback();
+    this.cursorMotionIndex = 0; // start cursor play over again
+    return( { x:100,y:100 } );
   }
 
   playbackEvent = () => {
@@ -83,14 +70,12 @@ class Cursor extends Component {
   }
 
   startPlayback() {
-    this.lastPlayMarker = new Date().getTime();
     this.setState( {playingBack:true, playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
   }
   
   stopPlayback = () => {
     clearInterval(this.state.playbackInterval);
     this.setState({playingBack:false});
-    console.log('Stopped cursor playback');
   }
 
   render() {

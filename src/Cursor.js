@@ -9,21 +9,27 @@ class Cursor extends Component {
       cursorMotion: [],
     }
     this.cursorMotionIndex = 1;
+    this.cursorPosition = { x: 0, y: 0 };
     this.lastPlayMarker = 0;
+    this.recordingSpeed = 10; // ms
   }
 
   componentDidMount() {
-    this.registerCursorMotion(this.props.node);
+    this.saveCursorLocation();
   }
 
-  registerCursorMotion() {
-    window.onmousemove = (e) => this.recordCursorMotion(e);
+  saveCursorLocation() {
+    window.onmousemove = (e) => { 
+      this.cursorPosition = { x: e.pageX, y: e.pageY };
+    };
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.recording !== nextProps.recording) {
       if (nextProps.recording) {
-        this.setState({cursorMotion:[]}); // reset cursor recording
+        this.startRecording();
+      } else {
+        this.stopRecording();
       }
     } else if (nextProps.playingBack !== this.props.playingBack) {
       if (nextProps.playingBack) {
@@ -34,23 +40,23 @@ class Cursor extends Component {
     }
   }
 
-  recordCursorMotion(e) {
-    if (this.props.recording) {
-      var now = new Date().getTime();
-      var cursorPos = { x: e.pageX, y: e.pageY, t: now };
-      this.setState({cursorMotion:[...this.state.cursorMotion, cursorPos]});
-    }
+
+  startRecording() {
+    this.setState({cursorMotion:[], recordInterval: setInterval(this.recordCursorMotion, this.recordingSpeed) } );
   }
 
-  stopPlayback = () => {
-    clearInterval(this.state.playbackInterval);
-    this.setState({playingBack:false});
-    console.log('Stopped cursor playback');
+  stopRecording() {
+    clearInterval(this.state.recordInterval);
+  }
+
+  recordCursorMotion = (e) => {
+    var now = new Date().getTime();
+    var newPosition = { x: this.cursorPosition.x, y: this.cursorPosition.y, t: now };
+    this.setState({cursorMotion:[...this.state.cursorMotion, newPosition]});
   }
 
   getPosition = () => {
     if (this.state.playingBack) {
-      //console.log('getPosition');
       if ((this.state.cursorMotion.length > 0) && (this.cursorMotionIndex < this.state.cursorMotion.length)) {
         var now = new Date().getTime();
         //console.log('sending position back');
@@ -73,15 +79,20 @@ class Cursor extends Component {
   }
 
   playbackEvent = () => {
-    //console.log('playback event fired.');
     this.setState({position: this.getPosition()});
   }
 
   startPlayback() {
     this.lastPlayMarker = new Date().getTime();
-    this.setState( {playingBack:true, playbackInterval: setInterval(this.playbackEvent, 10) });
+    this.setState( {playingBack:true, playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
   }
   
+  stopPlayback = () => {
+    clearInterval(this.state.playbackInterval);
+    this.setState({playingBack:false});
+    console.log('Stopped cursor playback');
+  }
+
   render() {
     return (
       <FontAwesome name="cursor" className='fa-mouse-pointer cursor' 

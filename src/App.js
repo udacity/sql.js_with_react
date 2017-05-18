@@ -1,4 +1,7 @@
 // TODO:
+// Switch to MS sampling in Cursor.js
+// mode=neutral
+// rewind: calculate steps
 // Rewindable time scrubber
 // Recording is additive, but you can reset the whole thing
 // Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast

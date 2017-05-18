@@ -80,11 +80,19 @@ class SimplerCodeMirror extends Component {
     this.setState({ history: [], initialCmContents: initialCmContents, initialCursorPos: initialCursorPos, recordingStartTime: now });
   }
 
+  stopPlayback = () => {
+    clearInterval(this.state.replayInterval);
+    this.cm.setOption("readOnly", false );
+  }
+  
   playHistory = () => {
-    if (this.props.recording || this.state.lastPlayMarker === this.state.history.length) {
-      console.log('History done or recording started.');
-      clearInterval(this.state.replayInterval);
-      this.cm.setOption("readOnly", false );
+    if (this.props.recording) {
+      console.log('Stop xterm playback because recording started.');
+      this.stopPlayback();
+    } else if (this.state.lastPlayMarker === this.state.history.length) {
+      console.log('End xterm playback.');
+      this.stopPlayback();
+      this.setState({lastPlayMarker:0});
     } else {
       if (this.correctedChangeCount > 0) {
         console.log('doing undo number:', this.correctedChangeCount);
@@ -142,7 +150,7 @@ class SimplerCodeMirror extends Component {
 
     console.log('replaying changes at correct speed');
     this.cm.setCursor(this.state.initialCursorPos);
-    this.setState({replayInterval: setInterval(this.playHistory, 1), lastPlayMarker: 0 });
+    this.setState({replayInterval: setInterval(this.playHistory, 1) });
   }
 
   recordAction = (cm, action) => {

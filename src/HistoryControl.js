@@ -6,15 +6,15 @@ class HistoryControl extends Component {
   constructor(props, context) {
     super(props, context)
     this.state = {
-      currentTime: 0,
+      currentSliderValue: 0,
       duration: 3600,
       maxRange : 1000
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.currentTime !== nextProps.newTime) {
-      this.setState({currentTime: nextProps.newTime});
+    if (this.state.currentSliderValue !== nextProps.sliderValue) {
+      this.setState({currentSliderValue: nextProps.sliderValue});
     }
   }
 
@@ -30,16 +30,16 @@ class HistoryControl extends Component {
     }
     console.log('Value:', value, ' Slider time:', time);
     this.setState({
-      currentTime: value
+      currentSliderValue: value
     });
-    this.props.updateTime(value);
+    this.props.updateSlider(value);
   }
 
   render() {
     return (    
       <Range className="scrubber"
       onChange={this.handleOnChange}
-      value={this.state.currentTime}
+      value={this.state.currentSliderValue}
       min={0}
       max={this.state.maxRange} />
       

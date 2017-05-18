@@ -25,21 +25,32 @@ class Cursor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.recording !== nextProps.recording) {
-      if (nextProps.recording) {
-        this.startRecording();
-      } else {
-        this.stopRecording();
-      }
-    } else if (nextProps.playingBack !== this.props.playingBack) {
-      if (nextProps.playingBack) {
-        this.startPlayback();
-      } else {
-        this.stopPlayback();
+    if (this.props.mode !== nextProps.mode) {
+      switch (nextProps.mode) {
+        case 'recording':
+          if (this.props.mode === 'playback') {
+            this.stopPlayback();
+          }
+          this.startRecording();
+          break;
+        case 'playback':
+          if (this.props.mode === 'recording') {
+            this.stopRecording();
+          }
+          this.startPlayback();
+          break;
+        case 'configuration':
+          if (this.props.mode === 'playback') {
+            this.stopPlayback();
+          } else if (this.props.mode === 'recording') {
+            this.stopRecording();
+          }
+          break;
+        default:
+          break;
       }
     }
   }
-
 
   startRecording() {
     this.cursorMotion = [];

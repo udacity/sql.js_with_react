@@ -16,10 +16,10 @@ class RecordAudio extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.recording !== this.state.isRecording) {
-      if (nextProps.recording) {
+    if (this.props.mode !== nextProps.mode) {
+      if (nextProps.mode === 'recording') {
         this.startAudioRecording();
-      } else {
+      } else if (this.props.mode === 'recording') {
         this.stopAudioRecording();
       }
     }
@@ -48,10 +48,9 @@ class RecordAudio extends Component {
     audioObj.load();
     //audioObj.play();
     //window.audioObj = audioObj;
-    // set time of clip for scrubbing: http://stackoverflow.com/questions/9563887/setting-html5-audio-position
+    // Set time of clip for scrubbing: 
+    // http://stackoverflow.com/questions/9563887/setting-html5-audio-position
 
-    //    var source = audioCtx.createMediaElementSource(audio);
-    //    source.connect(audioCtx.destination);
     this.saveAudioForPlayback(audioObj);
   }
 

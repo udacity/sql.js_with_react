@@ -10,14 +10,13 @@ class Xterm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [],
-      recording: true,
+      history:[],
+      historyIndex: undefined,
       replayInterval: undefined,
       replayStartTime: undefined,
+      resetOnNextPlay:false,
       pid: undefined
     }
-    this.runRealTerminal = this.runRealTerminal.bind(this);
-    this.playHistory = this.playHistory.bind(this);
   }
 
   getXtermHost() {
@@ -36,13 +35,20 @@ class Xterm extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.recording !== nextProps.recording) {
-      if (nextProps.recording) {
-        this.resetRecording();
-      }
-    } else if (this.props.playingBack !== nextProps.playingBack) {
-      if (nextProps.playingBack) {
-        this.playRecording();
+    if (this.props.mode !== nextProps.mode) {
+      switch (nextProps.mode) {
+        case 'recording':
+          this.resetRecording();
+          break;
+        case 'playback':
+          this.startPlayback();
+          break;
+        case 'configuration':
+        default:
+          if (this.props.mode === 'playback') {
+            this.stopPlayback();
+          }
+          break;
       }
     }
   }
@@ -109,35 +115,40 @@ class Xterm extends Component {
 
   }
   
-  runRealTerminal() {
+  runRealTerminal = () => {
     console.log('attaching...');
     this.term.attach(this.socket);
     this.term._initialized = true;
   }
 
   resetRecording() {
+    this.setState({history:[], historyIndex: 0});
     const host = this.getXtermHost();
     fetch(`${host.httpHost}/terminal/history/reset`);
   }
 
-  playHistory() {
-    if (this.props.recording || this.state.history.length === 0) {
-      console.log('History done or recording started.');
-      this.setState({recording:true});
-      clearInterval(this.state.replayInterval);
+  stopPlayback() {
+    console.log('Stopping xterm playback');
+    clearInterval(this.state.replayInterval);
+  }
+  
+  playHistory = () => {
+    if (this.state.historyIndex === this.state.history.length) {
+      console.log('Xterm playback done.');
+      this.setState({resetOnNextPlay: true});
+      this.stopPlayback();
     } else {
-      console.log('running history');
-      var nextAction = this.state.history[0];
+      console.log('Playing xterm history');
+      var nextAction = this.state.history[this.state.historyIndex];
       var timeDiff = new Date().getTime() - this.state.replayStartTime;
       if (timeDiff > nextAction.timeOffset) {
-        var historyItem = this.state.history[0];
-        this.setState({history: this.state.history.splice(1,this.state.history.length - 1)});
+        var historyItem = this.state.history[this.state.historyIndex++];
         if (historyItem.type === 'data') {
           this.term.viewport.viewportElement.click();
           this.term.write(historyItem.data);
-          console.log('data history:',historyItem);
+          console.log('Data history:',historyItem);
         } else if (historyItem.type === 'scroll') {
-          console.log('scrolling during playback to: ', historyItem.data);
+          console.log('Scrolling during playback to: ', historyItem.data);
           var scrollTop = historyItem.data;
           this.term.viewport.viewportElement.scrollTop = scrollTop;
         }
@@ -145,17 +156,26 @@ class Xterm extends Component {
     }
   }
 
-  playRecording() {
-    this.setState({recording:false});
-    const host = this.getXtermHost();
-    fetch(`${host.httpHost}/terminal/history/all`)
-      .then(response => response.json() )
-      .then(data => { 
-        this.term.viewport.viewportElement.click();
+  startPlayback() {
+    if (this.state.history.length > 0) {
+      this.term.viewport.viewportElement.click();
+      if (this.state.resetOnNextPlay) {
         this.term.reset();
-        //console.log('Got history:', data);
-        this.setState({history: data, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
-      });
+        this.setState({historyIndex:0});
+      }
+      this.setState({resetOnNextPlay: false, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
+    } else {
+      const host = this.getXtermHost();
+      fetch(`${host.httpHost}/terminal/history/all`)
+        .then(response => response.json() )
+        .then(data => { 
+          //console.log('Got history:', data);
+          this.term.viewport.viewportElement.click();
+          this.term.reset();
+          //console.log('Got history:', data);
+          this.setState({history: data, historyIndex:0, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
+        });
+    }
   }
 
   render() {

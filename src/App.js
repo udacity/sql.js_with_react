@@ -1,8 +1,8 @@
 // TODO:
-// Switch to MS sampling in Cursor.js
-// mode=neutral
-// rewind: calculate steps
-// Rewindable time scrubber
+// X Switch to MS sampling in Cursor.js
+// X mode=neutral
+// Promises: rewinding
+// rewind: calculate steps/ rewindable time scrubber
 // Recording is additive, but you can reset the whole thing
 // Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast
 // Tab panels
@@ -13,6 +13,7 @@
 
 
 import React, { Component } from 'react';
+import update from 'react-addons-update';
 import Button from './Button';
 import Cursor from './Cursor';
 import RecordAudio from './RecordAudio';
@@ -30,63 +31,80 @@ class App extends Component {
     super(props);
 
     this.state = {
-      recording: false,
-      playingBack: false,
-      firstRecordingComplete: false,
+      mode: 'configuration', // mode is one of : 'configuration', 'recording', 'playback'
+      recordingInfo: {},
+      playbackInfo: {},
       sliderValue: 0,
       cmOptions: { historyEventDelay: 50 }
     };
 
   }
 
-  endPlayback = () => {
+  stopPlayback = () => {
     console.log('endPlayback');
-    this.setState({playingBack: false});
+    this.setState({mode: 'configuration'});
     this.state.audioObj.pause();
-    clearInterval(this.state.playbackTimer);
+    clearInterval(this.state.playbackInfo.timer);
   }
-  
+
   saveAudioForPlayback(audioObj) {
     this.setState({audioObj:audioObj});
   }
 
   startRecording() {
     var now = new Date().getTime();
-    this.setState({recording:true, firstRecordingComplete: true, recordingStartTime: now});
+    const newState = update(this.state, {
+      mode: { $set: 'recording' },
+      recordingInfo: { $merge: {
+        firstRecordingComplete: true,
+        recordingStartTime: now
+      }}
+    });
+    this.setState(newState);
+
     console.log('Recording started.');
   }
 
   stopRecording() {
     var now = new Date().getTime();
-    var duration = now - this.state.recordingStartTime;
-    this.setState({recording:false, recordingDuration: duration});
+    var duration = now - this.state.recordingInfo.recordingStartTime;
+    this.setState({ mode:'configuration', recordingDuration: duration });
     console.log('Recording stopped, duration:', duration);
   }
 
   startStopPlayback() {
-    if (!this.state.firstRecordingComplete) {
+    if (!this.state.recordingInfo.firstRecordingComplete) {
       return;
     }
 
-    if (this.state.playingBack) {
-      this.endPlayback();
+    if (this.state.mode === 'playback') { // currently playing back, so stop it
+      this.stopPlayback();
       return;
     }
 
     console.log('Playing recording.');
     var now = new Date().getTime();
-    this.setState({recording:false, playingBack: true, playbackStartTime: now, playbackTimer: setInterval(this.updatePlaybackTimer, 10) });
+    const newState = update(this.state, {
+      mode: { $set: 'playback'},
+      playbackInfo: {
+        $merge: {
+          startTime: now,
+          timer: setInterval(this.updatePlaybackTimer, 10)
+        }
+      }
+    });
+    this.setState(newState);
     this.state.audioObj.play();
   }
 
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
-    var currentPosition = now - this.state.playbackStartTime;
+    var currentPosition = now - this.state.playbackInfo.startTime;
     var newSliderValue = (( currentPosition / this.state.recordingDuration) * 1000);
     this.updateSlider(newSliderValue);
-    if (currentPosition >= this.state.recordingDuration + 1000) {
-      console.log('ending playback from updatePlaybackTimer');
-      this.endPlayback();
+    if (currentPosition >= this.state.recordingDuration) {
+      console.log('Ending playback from updatePlaybackTimer');
+      this.stopPlayback();
     }
   }
 
@@ -99,26 +117,49 @@ class App extends Component {
     //console.log(this.state.userQuery);
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
-      {this.props.useHeader !== "0" ?
-       <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h3>Session Recording Demo</h3>
-        </div>
-                                               : null
-      }
-      <Cursor id="cursor" recording={this.state.recording} playingBack={this.state.playingBack} endAllPlayback={this.endAllPlayback} />
-
-      <Button disabled={this.state.playingBack} click={() => {(this.state.recording ? this.stopRecording() : this.startRecording() ) }} 
-      label={(this.state.recording ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } title={`Make Recording`}/>
-      <Button disabled={this.state.recording || !this.state.firstRecordingComplete} click={() => this.startStopPlayback()  } label={(this.state.playingBack ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } title={`Play recording`}/>
-
-      <SimplerCodeMirror recording={this.state.recording} playingBack={this.state.playingBack} endAllPlayback={this.endAllPlayback} options={this.state.cmOptions}/>
-      <Xterm recording={this.state.recording} playingBack={this.state.playingBack} endAllPlayback={this.endAllPlayback} />
-      <HistoryControl recordingDuration={this.state.recordingDuration} updateSlider={this.updateSlider} sliderValue={this.state.sliderValue} />
-      <RecordAudio recording={this.state.recording} saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } />
       {
-        //      <div className="SqlOutput"><SQLOutput userQuery={this.state.userQuery} db={this.state.db}/></div>
+       this.props.useHeader !== "0" ? <div className="App-header"><img src={logo} className="App-logo" alt="logo" /><h3>Session Recording Demo</h3></div> : null
       }
+
+      <Cursor id="cursor" mode={this.state.mode} endAllPlayback={this.endAllPlayback} />
+
+      <Button 
+        disabled={this.state.mode === 'playback' } 
+        click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
+        label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
+        title={`Make Recording`}
+      />
+      
+      <Button 
+        disabled={this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete} 
+        click={() => this.startStopPlayback()  } 
+        label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
+        title={`Play/Stop`}
+      />
+
+      <SimplerCodeMirror 
+        mode={this.state.mode} 
+        endAllPlayback={this.endAllPlayback} 
+        options={this.state.cmOptions}
+      />
+
+      <Xterm 
+        mode={this.state.mode} 
+        endAllPlayback={this.endAllPlayback} 
+      />
+
+      <HistoryControl 
+        mode={this.state.mode} 
+        recordingDuration={this.state.recordingDuration} 
+        updateSlider={this.updateSlider} 
+        sliderValue={this.state.sliderValue} 
+      />
+
+      <RecordAudio 
+      mode={this.state.mode} 
+      saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
+      />
+
       </div>
     );
   }

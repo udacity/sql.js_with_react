@@ -41,12 +41,36 @@ class App extends Component {
   }
 
   stopPlayback = () => {
-    console.log('endPlayback');
-    this.setState({mode: 'configuration'});
+    console.log('stopPlayback');
+    var now = new Date().getTime();
+    var playedBackThisTime = now - this.state.playbackInfo.startTime;
+    var newFarthestPointReached = this.state.playbackInfo.farthestPointReached + playedBackThisTime;
+    const newState = update(this.state, {
+      mode: { $set: 'configuration' },
+      playbackInfo: { 
+        $merge: {
+          farthestPointReached: newFarthestPointReached
+        }
+      }
+    });
+    this.setState(newState);
+
     this.state.audioObj.pause();
     clearInterval(this.state.playbackInfo.timer);
   }
 
+  stopAndResetPlayback = () => {
+    this.stopPlayback();
+    const newState = update(this.state, {
+      playbackInfo: { 
+        $merge: {
+          farthestPointReached: 0
+        }
+      }
+    });
+    this.setState(newState);
+  }
+  
   saveAudioForPlayback(audioObj) {
     this.setState({audioObj:audioObj});
   }
@@ -68,7 +92,17 @@ class App extends Component {
   stopRecording() {
     var now = new Date().getTime();
     var duration = now - this.state.recordingInfo.recordingStartTime;
-    this.setState({ mode:'configuration', recordingDuration: duration });
+
+    const newState = update(this.state, {
+      mode: { $set: 'configuration' },
+      recordingInfo: { $merge: {
+        duration: duration
+      }},
+      playbackInfo: { $merge: {
+        farthestPointReached: 0
+      }}                       
+    });
+    this.setState(newState);
     console.log('Recording stopped, duration:', duration);
   }
 
@@ -99,12 +133,13 @@ class App extends Component {
 
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
-    var currentPosition = now - this.state.playbackInfo.startTime;
-    var newSliderValue = (( currentPosition / this.state.recordingDuration) * 1000);
+    var playedBackThisTime = now - this.state.playbackInfo.startTime;
+    var totalPlayedBack = this.state.playbackInfo.farthestPointReached + playedBackThisTime;
+    var newSliderValue = (( totalPlayedBack / this.state.recordingInfo.duration) * 1000);
     this.updateSlider(newSliderValue);
-    if (currentPosition >= this.state.recordingDuration) {
+    if (totalPlayedBack >= this.state.recordingInfo.duration) {
       console.log('Ending playback from updatePlaybackTimer');
-      this.stopPlayback();
+      this.stopAndResetPlayback();
     }
   }
 
@@ -131,7 +166,7 @@ class App extends Component {
       />
       
       <Button 
-        disabled={this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete} 
+        disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
         click={() => this.startStopPlayback()  } 
         label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
         title={`Play/Stop`}
@@ -150,7 +185,7 @@ class App extends Component {
 
       <HistoryControl 
         mode={this.state.mode} 
-        recordingDuration={this.state.recordingDuration} 
+        duration={this.state.recordingInfo.duration} 
         updateSlider={this.updateSlider} 
         sliderValue={this.state.sliderValue} 
       />

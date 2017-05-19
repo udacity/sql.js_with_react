@@ -1,6 +1,7 @@
 // TODO:
 //
 // Scrub: calculate steps/ rewindable time scrubber
+// Display recorded time so far
 // Recording is additive, but you can start your recording all over again
 // Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Possibly, remove the first undo from getHistory and call setHistory
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md

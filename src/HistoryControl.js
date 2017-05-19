@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-// import 'react-rangeslider/lib/index.css';
-// https://www.npmjs.com/package/range-input-react
-// https://github.com/Mapker/react-range-input
-// NOT to be confused with react-input-range!!
-import Range from 'range-input-react';
+import Range from './Range';
 
 class HistoryControl extends Component {
   constructor(props, context) {
@@ -21,12 +17,17 @@ class HistoryControl extends Component {
     }
   }
 
-  handleOnChange = (e) => {
+  handleOnChange(e) {
     var value = Number(e.target.value);
     this.setState({currentSliderValue:value});
-    this.props.scrub(value, this.state.maxRange);
   }
 
+  handleOnChangeComplete(e) {
+    var value = Number(e.target.value);
+    console.log('change complete, scrubbing to :', value);
+    this.props.scrub(value, this.state.maxRange);
+  }
+  
   timeZeroPad(num) {
     const strNum = num.toString();
     return(strNum.length < 2 ? '0' + strNum : strNum);
@@ -54,11 +55,13 @@ class HistoryControl extends Component {
     return (    
       <div> 
       <Range className="scrubber"
-      onChange={this.handleOnChange}
+      disabled={this.props.disabled}
+      onChange={this.handleOnChange.bind(this)}
+      onChangeComplete={this.handleOnChangeComplete.bind(this)}
       value={this.state.currentSliderValue}
       min={0}
       max={this.state.maxRange} />
-      <div className="historyTime">Time:{this.computeCurrentTime()}</div>
+      <div className="historyTime">&nbsp;Time:&nbsp;{this.computeCurrentTime()}</div>
       </div>
     )
   } 

@@ -40,6 +40,7 @@ class App extends Component {
       cmOptions: { historyEventDelay: 50 }
     };
 
+    this.scrub = this.scrub.bind(this);
   }
 
   stopPlayback = () => {
@@ -146,15 +147,18 @@ class App extends Component {
   }
 
   // Scrub to a particular location
-  scrub = (value) => {
-    this.setState({mode:'scrub'});
-    this.furthestPointReached = this.recordingInfo.duration * value;
-    console.log('Scrubbed to time:',this.furthestPointReached);
+  scrub(value) {
+    this.stopPlayback();
+    this.setState({mode:'scrub', sliderValue: value});
+    if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
+      this.furthestPointReached = this.state.recordingInfo.duration * value;
+      console.log('Scrubbed to time:',this.furthestPointReached);
+    }
   }
 
   updateSlider = (newSliderValue) => {
     this.setState({sliderValue: newSliderValue});
-    //console.log('app.js: set sliderValue=', newSliderValue);
+    console.log('app.js: set sliderValue=', newSliderValue);
   }
 
   render() {
@@ -198,7 +202,7 @@ class App extends Component {
         disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
         duration={this.state.recordingInfo.duration} 
         updateSlider={this.updateSlider} 
-        sliderValue={this.state.sliderValue} 
+        newSliderValue={this.state.sliderValue} 
       />
 
       <RecordAudio 

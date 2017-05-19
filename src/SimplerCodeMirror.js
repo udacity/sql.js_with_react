@@ -148,8 +148,12 @@ class SimplerCodeMirror extends Component {
     }
   }
   
-  broken = () => {
-    console.log('broken:', this.state);
+//  broken = () => {
+//    console.log('broken:', this.state);
+//  }
+
+  scrub = () => {
+    console.log('SimplerCodeMirror scrubbing');
   }
   
   playbackRecording = () => {

@@ -16,21 +16,17 @@ class HistoryControl extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.currentSliderValue !== nextProps.sliderValue) {
-      this.setState({currentSliderValue: nextProps.sliderValue});
+    if (this.state.currentSliderValue !== nextProps.newSliderValue) {
+      this.setState({currentSliderValue: nextProps.newSliderValue});
     }
   }
 
   handleOnChange = (e) => {
     var value = Number(e.target.value);
     this.setState({currentSliderValue:value});
-  }
-
-  handleOnChangeComplete = (e) => {
-    var value = Number(e.target.value);
     this.props.scrub(value);
   }
-  
+
   timeZeroPad(num) {
     const strNum = num.toString();
     return(strNum.length < 2 ? '0' + strNum : strNum);
@@ -55,12 +51,9 @@ class HistoryControl extends Component {
   }
   
   render() {
-    var labels = { 0: 'Low', 50: 'Medium', 100: 'High'};
     return (    
       <div> 
       <Range className="scrubber"
-      tooltip={true}
-      labels={labels}
       onChange={this.handleOnChange}
       value={this.state.currentSliderValue}
       min={0}

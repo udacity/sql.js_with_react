@@ -41,8 +41,8 @@ class Cursor extends Component {
           }
           this.startPlayback();
           break;
-        case 'rewinding':
-          this.rewind();
+        case 'scrub':
+          this.scrub();
           break;
         case 'configuration':
           if (this.props.mode === 'playback') {
@@ -132,7 +132,7 @@ class Cursor extends Component {
     this.mustResetOnNextPlay = true;
   }
 
-  rewind = () => {
+  scrub = () => {
     this.cursorMotionIndex = 0;
   }
   

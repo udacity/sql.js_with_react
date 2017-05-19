@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 // import 'react-rangeslider/lib/index.css';
-// https://www.npmjs.com/package/range-input-react, NOT to be confused with react-input-range!!
+// https://www.npmjs.com/package/range-input-react
+// https://github.com/Mapker/react-range-input
+// NOT to be confused with react-input-range!!
 import Range from 'range-input-react';
 
 class HistoryControl extends Component {
@@ -24,6 +26,11 @@ class HistoryControl extends Component {
     this.setState({currentSliderValue:value});
   }
 
+  handleOnChangeComplete = (e) => {
+    var value = Number(e.target.value);
+    this.props.scrub(value);
+  }
+  
   timeZeroPad(num) {
     const strNum = num.toString();
     return(strNum.length < 2 ? '0' + strNum : strNum);

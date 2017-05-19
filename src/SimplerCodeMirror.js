@@ -49,8 +49,8 @@ class SimplerCodeMirror extends Component {
         case 'playback':
           this.playbackRecording();
           break;
-        case 'rewinding':
-          this.rewind(this.props.scrubTime);
+        case 'scrub':
+          this.scrub(this.props.scrubTime);
           break;
         case 'configuration':
           if (this.props.mode === 'recording') {
@@ -211,12 +211,12 @@ class SimplerCodeMirror extends Component {
       var minMaxCh = orderTwo(selection.anchor.ch,selection.head.ch);
       var minMaxLine = orderTwo(selection.anchor.line,selection.head.line);
       var selectionLength = Math.abs(minMaxCh[1] - minMaxCh[0]);
-      console.log('selectionLength:', selectionLength);
+      //console.log('selectionLength:', selectionLength);
       if (selectionLength === 0) {
         this.recordAction(cm, { type: 'cursorActivity', record: { position: cm.getCursor() }});;
       } else {
         this.recordAction(cm, { type: 'selection', record: { line: minMaxLine, ch: minMaxCh }});;
-        console.log('Selected:', minMaxLine[0], ':', minMaxCh[0], 'to', minMaxLine[1], ':', minMaxCh[1]);
+        //console.log('Selected:', minMaxLine[0], ':', minMaxCh[0], 'to', minMaxLine[1], ':', minMaxCh[1]);
       }
     }
   }

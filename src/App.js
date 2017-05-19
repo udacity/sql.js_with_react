@@ -1,6 +1,6 @@
 // TODO:
 //
-// Rewind: calculate steps/ rewindable time scrubber
+// Scrub: calculate steps/ rewindable time scrubber
 // Recording is additive, but you can start your recording all over again
 // Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Possibly, remove the first undo from getHistory and call setHistory
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
@@ -33,7 +33,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      mode: 'configuration', // mode is one of : 'configuration', 'recording', 'playback', 'rewinding'
+      mode: 'configuration', // mode is one of : 'configuration', 'recording', 'playback', 'scrub'
       recordingInfo: {},
       playbackInfo: {},
       sliderValue: 0,
@@ -145,6 +145,13 @@ class App extends Component {
     }
   }
 
+  // Scrub to a particular location
+  scrub = (value) => {
+    this.setState({mode:'scrub'});
+    this.furthestPointReached = this.recordingInfo.duration * value;
+    console.log('Scrubbed to time:',this.furthestPointReached);
+  }
+
   updateSlider = (newSliderValue) => {
     this.setState({sliderValue: newSliderValue});
     //console.log('app.js: set sliderValue=', newSliderValue);
@@ -187,6 +194,7 @@ class App extends Component {
 
       <HistoryControl 
         mode={this.state.mode} 
+        scrub={this.scrub}
         disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
         duration={this.state.recordingInfo.duration} 
         updateSlider={this.updateSlider} 
@@ -194,8 +202,8 @@ class App extends Component {
       />
 
       <RecordAudio 
-      mode={this.state.mode} 
-      saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
+        mode={this.state.mode} 
+        saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
       />
 
       </div>

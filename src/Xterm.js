@@ -85,7 +85,7 @@ class Xterm extends Component {
       //console.log('scroll:', e);
       var target = e.target;
       var scrollTop = target.scrollTop;
-      console.log('scrollTop:', scrollTop);
+      //console.log('scrollTop:', scrollTop);
       fetch(`${host.httpHost}/terminal/history/record/scroll`, {
         headers: {
           'Accept': 'application/json',
@@ -138,7 +138,7 @@ class Xterm extends Component {
       this.setState({resetOnNextPlay: true});
       this.stopPlayback();
     } else {
-      console.log('Playing xterm history');
+      // console.log('Playing xterm history');
       var nextAction = this.state.history[this.state.historyIndex];
       var timeDiff = new Date().getTime() - this.state.replayStartTime;
       if (timeDiff > nextAction.timeOffset) {
@@ -146,9 +146,9 @@ class Xterm extends Component {
         if (historyItem.type === 'data') {
           this.term.viewport.viewportElement.click();
           this.term.write(historyItem.data);
-          console.log('Data history:',historyItem);
+          //console.log('Data history:',historyItem);
         } else if (historyItem.type === 'scroll') {
-          console.log('Scrolling during playback to: ', historyItem.data);
+          //console.log('Scrolling during playback to: ', historyItem.data);
           var scrollTop = historyItem.data;
           this.term.viewport.viewportElement.scrollTop = scrollTop;
         }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+// import 'react-rangeslider/lib/index.css';
+// https://www.npmjs.com/package/range-input-react, NOT to be confused with react-input-range!!
 import Range from 'range-input-react';
-import 'react-rangeslider/lib/index.css';
 
 class HistoryControl extends Component {
   constructor(props, context) {
@@ -20,19 +21,7 @@ class HistoryControl extends Component {
 
   handleOnChange = (e) => {
     var value = Number(e.target.value);
-    var time;
-    if (value === this.state.maxRange) {
-      time = this.state.duration;
-    } else if (value === 0) {
-      time = 0;
-    } else {
-      time = (value / this.state.maxRange) * this.state.duration;
-    }
-    console.log('Value:', value, ' Slider time:', time);
-    this.setState({
-      currentSliderValue: value
-    });
-    this.props.updateSlider(value);
+    this.setState({currentSliderValue:value});
   }
 
   timeZeroPad(num) {
@@ -44,21 +33,27 @@ class HistoryControl extends Component {
     if (this.props.duration === undefined) {
       return('--:--:--');
     }
-    const currentTimeSeconds = (this.props.duration * (this.state.currentSliderValue / this.state.maxRange)) / 1000.0;
+    const currentTimeMilliseconds = this.props.duration * (this.state.currentSliderValue / this.state.maxRange);
+    const currentTimeSeconds = currentTimeMilliseconds / 1000;
     const computedHour = Math.floor(currentTimeSeconds / 3600);
     const computedMinutes = Math.floor((currentTimeSeconds - (computedHour * 3600)) / 60);
     const computedSeconds = Math.floor(currentTimeSeconds - (computedMinutes * 60 + computedHour * 3600));
-    let displayHour = this.timeZeroPad(computedHour);
-    let displayMinutes = this.timeZeroPad(computedMinutes);
+    const computedMilliseconds = (Math.floor(currentTimeMilliseconds - ((computedSeconds + computedMinutes * 60 + computedHour * 3600) * 1000)) / 10).toFixed(0);
+    let displayMilliseconds = this.timeZeroPad(computedMilliseconds);
     let displaySeconds = this.timeZeroPad(computedSeconds);
-    const currentTimeFormatted = `${displayHour}:${displayMinutes}:${displaySeconds}`;
+    let displayMinutes = this.timeZeroPad(computedMinutes);
+    let displayHour = this.timeZeroPad(computedHour);
+    const currentTimeFormatted = `${displayHour}:${displayMinutes}:${displaySeconds}:${displayMilliseconds}`;
     return(currentTimeFormatted);    
   }
   
   render() {
+    var labels = { 0: 'Low', 50: 'Medium', 100: 'High'};
     return (    
       <div> 
       <Range className="scrubber"
+      tooltip={true}
+      labels={labels}
       onChange={this.handleOnChange}
       value={this.state.currentSliderValue}
       min={0}

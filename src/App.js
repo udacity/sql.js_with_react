@@ -168,8 +168,8 @@ class App extends Component {
       />
       
       <Button 
-        disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-        click={() => this.startStopPlayback()  } 
+      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
+      click={() => this.startStopPlayback()  } 
         label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
         title={`Play/Stop`}
       />
@@ -187,6 +187,7 @@ class App extends Component {
 
       <HistoryControl 
         mode={this.state.mode} 
+        disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
         duration={this.state.recordingInfo.duration} 
         updateSlider={this.updateSlider} 
         sliderValue={this.state.sliderValue} 

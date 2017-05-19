@@ -49,6 +49,9 @@ class SimplerCodeMirror extends Component {
         case 'playback':
           this.playbackRecording();
           break;
+        case 'rewinding':
+          this.rewind(this.props.scrubTime);
+          break;
         case 'configuration':
           if (this.props.mode === 'recording') {
             this.stopRecording();

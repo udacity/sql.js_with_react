@@ -1,17 +1,18 @@
 // TODO:
-// X Switch to MS sampling in Cursor.js
-// X mode=neutral
-// X Current time display
-// Promises: rewinding
-// rewind: calculate steps/ rewindable time scrubber
-// Recording is additive, but you can reset the whole thing
-// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast
-// Tab panels
-// Fork
-// https://github.com/reactjs/react-tabs/blob/master/README.md
+//
+// Cursor: make it adjust for lag/timeshift and don't repeat same positions
+// Rewind: calculate steps/ rewindable time scrubber
+// Recording is additive, but you can start your recording all over again
+// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Possibly, remove the first undo from getHistory and call setHistory
+// Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
+// Fork this code
+// 
 // React preview window with REACT-ND's sample project
 // Some way to record DevTools and possibly interactions with the student React App
 
+// X Switch to MS sampling in Cursor.js
+// X mode=neutral
+// X Current time display
 
 import React, { Component } from 'react';
 import update from 'react-addons-update';
@@ -32,7 +33,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      mode: 'configuration', // mode is one of : 'configuration', 'recording', 'playback'
+      mode: 'configuration', // mode is one of : 'configuration', 'recording', 'playback', 'rewinding'
       recordingInfo: {},
       playbackInfo: {},
       sliderValue: 0,

@@ -135,3 +135,12 @@
   display:block;
 }
 
+.historyTime {
+  font-size:12px;
+  position:relative;
+  text-align:left;
+  z-index:1000;
+  color:#555;
+  top:0px;
+  left:0px;
+}

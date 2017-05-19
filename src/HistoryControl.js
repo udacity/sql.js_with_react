@@ -35,14 +35,36 @@ class HistoryControl extends Component {
     this.props.updateSlider(value);
   }
 
+  timeZeroPad(num) {
+    const strNum = num.toString();
+    return(strNum.length < 2 ? '0' + strNum : strNum);
+  }
+
+  computeCurrentTime = () => {
+    if (this.props.duration === undefined) {
+      return('--:--:--');
+    }
+    const currentTimeSeconds = (this.props.duration * (this.state.currentSliderValue / this.state.maxRange)) / 1000.0;
+    const computedHour = Math.floor(currentTimeSeconds / 3600);
+    const computedMinutes = Math.floor((currentTimeSeconds - (computedHour * 3600)) / 60);
+    const computedSeconds = Math.floor(currentTimeSeconds - (computedMinutes * 60 + computedHour * 3600));
+    let displayHour = this.timeZeroPad(computedHour);
+    let displayMinutes = this.timeZeroPad(computedMinutes);
+    let displaySeconds = this.timeZeroPad(computedSeconds);
+    const currentTimeFormatted = `${displayHour}:${displayMinutes}:${displaySeconds}`;
+    return(currentTimeFormatted);    
+  }
+  
   render() {
     return (    
+      <div> 
       <Range className="scrubber"
       onChange={this.handleOnChange}
       value={this.state.currentSliderValue}
       min={0}
       max={this.state.maxRange} />
-      
+      <div className="historyTime">Time:{this.computeCurrentTime()}</div>
+      </div>
     )
   } 
 }

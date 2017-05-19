@@ -41,15 +41,23 @@ class SimplerCodeMirror extends Component {
   }  
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.recording !== nextProps.recording) {
-      if (nextProps.recording) {
-        this.startRecording(); // start recording over
-      } else {
-        this.stopRecording();
-      }
-    } else if (this.props.playingBack !== nextProps.playingBack) {
-      if (nextProps.playingBack) {
-        this.playbackRecording();
+    if (this.props.mode !== nextProps.mode) {
+      switch (nextProps.mode) {
+        case 'recording':
+          this.startRecording(); // start recording over
+          break;
+        case 'playback':
+          this.playbackRecording();
+          break;
+        case 'configuration':
+          if (this.props.mode === 'recording') {
+            this.stopRecording();
+          } else if (this.props.mode === 'playback') {
+            this.stopPlayback();
+          }
+          break;
+        default:
+          break;
       }
     }
   }
@@ -86,10 +94,7 @@ class SimplerCodeMirror extends Component {
   }
   
   playHistory = () => {
-    if (this.props.recording) {
-      console.log('Stop xterm playback because recording started.');
-      this.stopPlayback();
-    } else if (this.state.lastPlayMarker === this.state.history.length) {
+    if (this.state.lastPlayMarker === this.state.history.length) {
       console.log('End xterm playback.');
       this.stopPlayback();
       this.setState({lastPlayMarker:0});
@@ -140,7 +145,14 @@ class SimplerCodeMirror extends Component {
     }
   }
   
-  playbackRecording() {
+  broken() {
+    console.log('here state is:', this.state);
+  }
+  
+  playbackRecording = () => {
+    this.broken();
+    setTimeout(this.broken, 1000);
+
     console.log('Before running redos, we have history:', this.cm.getHistory());
     console.log('changeCount = ', this.state.changeCount);
 
@@ -150,7 +162,7 @@ class SimplerCodeMirror extends Component {
 
     console.log('replaying changes at correct speed');
     this.cm.setCursor(this.state.initialCursorPos);
-    this.setState({replayInterval: setInterval(this.playHistory, 1) });
+    this.setState({replayInterval: setInterval(this.playHistory.bind(this), 1) });
   }
 
   recordAction = (cm, action) => {

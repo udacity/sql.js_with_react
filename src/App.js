@@ -1,6 +1,7 @@
 // TODO:
 // X Switch to MS sampling in Cursor.js
 // X mode=neutral
+// X Current time display
 // Promises: rewinding
 // rewind: calculate steps/ rewindable time scrubber
 // Recording is additive, but you can reset the whole thing
@@ -8,7 +9,7 @@
 // Tab panels
 // Fork
 // https://github.com/reactjs/react-tabs/blob/master/README.md
-// React preview window
+// React preview window with REACT-ND's sample project
 // Some way to record DevTools and possibly interactions with the student React App
 
 
@@ -137,7 +138,7 @@ class App extends Component {
     var totalPlayedBack = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     var newSliderValue = (( totalPlayedBack / this.state.recordingInfo.duration) * 1000);
     this.updateSlider(newSliderValue);
-    if (totalPlayedBack >= this.state.recordingInfo.duration + 1000) {
+    if (totalPlayedBack >= this.state.recordingInfo.duration) {
       console.log('Ending playback from updatePlaybackTimer');
       this.stopAndResetPlayback();
     }

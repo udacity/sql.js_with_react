@@ -11,7 +11,7 @@ class Cursor extends Component {
     this.cursorMotion = undefined;
     this.cursorMotionIndex = 0;
     this.cursorPosition = { x: 100, y: 100 };
-    this.recordingSpeed = 10; // ms
+    this.recordingSpeed = 50; // ms
   }
 
   componentDidMount() {
@@ -91,11 +91,18 @@ class Cursor extends Component {
 
   render() {
     return (
-      <FontAwesome name="cursor" className='fa-mouse-pointer cursor' 
-      style={{
+      <div>
+        <FontAwesome name="cursor" className='fa-mouse-pointer cursor' 
+        style={{
+          left: this.state.position.x, 
+          top: this.state.position.y
+        }}
+      />
+      <span className="cursor" style={{
         left: this.state.position.x, 
         top: this.state.position.y
-      }} />
+      }}>X</span>
+     </div>
     );
   }
 }

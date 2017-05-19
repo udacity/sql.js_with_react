@@ -12,6 +12,7 @@ class Cursor extends Component {
     this.cursorMotionIndex = 0;
     this.cursorPosition = { x: 100, y: 100 };
     this.recordingSpeed = 50; // ms
+    this.mustResetOnNextPlay = false;
   }
 
   componentDidMount() {
@@ -39,6 +40,9 @@ class Cursor extends Component {
           }
           this.startPlayback();
           break;
+        case 'rewinding':
+          this.rewind();
+          break;
         case 'configuration':
           if (this.props.mode === 'playback') {
             this.stopPlayback();
@@ -54,6 +58,8 @@ class Cursor extends Component {
 
   startRecording() {
     this.cursorMotion = [];
+    var now = new Date().getTime();
+    this.recordingStartTime = now;
     this.recordInterval = setInterval(this.recordCursorMotion, this.recordingSpeed);
   }
 
@@ -63,17 +69,40 @@ class Cursor extends Component {
   }
 
   recordCursorMotion = (e) => {
-    this.cursorMotion.push(this.cursorPosition);
+    var latestMotion = this.cursorMotion.length - 1;
+    var now = new Date().getTime();
+    var recordingDuration = now - this.recordingStartTime;
+    var cursorPositionClone = { x: this.cursorPosition.x, y:this.cursorPosition.y, t: recordingDuration };
+    if (latestMotion === -1) {
+      this.cursorMotion.push(cursorPositionClone);
+    } else {
+      var lastPosition = this.cursorMotion[latestMotion];
+      if ((this.cursorPosition.x === lastPosition.x) && (this.cursorPosition.y === lastPosition.y)) {
+        this.cursorMotion[latestMotion].t = recordingDuration; // just keep updating this record's time if the cursor hasn't moved
+      } else {      
+        this.cursorMotion.push(cursorPositionClone);
+      }
+    }
   }
 
   getPosition = () => {
-    if ((this.cursorMotion.length > 0) && (this.cursorMotionIndex < this.cursorMotion.length)) {
+    if (this.cursorMotion.length > 0) {
       //console.log('Cursor motion index:', this.cursorMotionIndex);
-      return(this.cursorMotion[this.cursorMotionIndex++]);
+      var now = new Date().getTime();
+      var playDuration = now - this.state.playbackStartTime;
+      var scanAhead = this.cursorMotionIndex;
+      while ((this.cursorMotion[scanAhead].t < playDuration) && (scanAhead < this.cursorMotion.length - 1)) {
+        //console.log('scanAhead:', scanAhead, 'playDuration:', playDuration, 'cursorMotionIndex:', this.cursorMotionIndex, 't:', this.cursorMotion[scanAhead].t);
+        ++scanAhead;
+      }
+      //console.log('getPosition: examining position', scanAhead);
+      if (scanAhead === this.cursorMotion.length - 1) {
+        this.stopPlaybackAndSetupForReset();
+      }
+      this.cursorMotionIndex = scanAhead;
+      return(this.cursorMotion[this.cursorMotionIndex]);
     }
 
-    this.stopPlayback();
-    this.cursorMotionIndex = 0; // start cursor play over again
     return( { x:100,y:100 } );
   }
 
@@ -82,13 +111,27 @@ class Cursor extends Component {
   }
 
   startPlayback() {
-    this.setState( { playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
+    var now = new Date().getTime();
+    if (this.mustResetOnNextPlay) {
+      this.cursorMotionIndex = 0;
+      this.mustResetOnNextPlay = false;
+    }
+    this.setState( { playbackStartTime: now, playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
   }
   
   stopPlayback = () => {
     clearInterval(this.state.playbackInterval);
   }
 
+  stopPlaybackAndSetupForReset = () => {
+    this.stopPlayback();
+    this.mustResetOnNextPlay = true;
+  }
+
+  rewind = () => {
+    this.cursorMotionIndex = 0;
+  }
+  
   render() {
     return (
       <div>

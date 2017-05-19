@@ -13,6 +13,7 @@ class Cursor extends Component {
     this.cursorPosition = { x: 100, y: 100 };
     this.recordingSpeed = 50; // ms
     this.mustResetOnNextPlay = false;
+    this.previousPlayDuration = 0;
   }
 
   componentDidMount() {
@@ -89,9 +90,9 @@ class Cursor extends Component {
     if (this.cursorMotion.length > 0) {
       //console.log('Cursor motion index:', this.cursorMotionIndex);
       var now = new Date().getTime();
-      var playDuration = now - this.state.playbackStartTime;
+      this.playDuration = now - this.state.playbackStartTime + this.previousPlayDuration;
       var scanAhead = this.cursorMotionIndex;
-      while ((this.cursorMotion[scanAhead].t < playDuration) && (scanAhead < this.cursorMotion.length - 1)) {
+      while ((this.cursorMotion[scanAhead].t < this.playDuration) && (scanAhead < this.cursorMotion.length - 1)) {
         //console.log('scanAhead:', scanAhead, 'playDuration:', playDuration, 'cursorMotionIndex:', this.cursorMotionIndex, 't:', this.cursorMotion[scanAhead].t);
         ++scanAhead;
       }
@@ -114,6 +115,8 @@ class Cursor extends Component {
     var now = new Date().getTime();
     if (this.mustResetOnNextPlay) {
       this.cursorMotionIndex = 0;
+      this.playDuration = 0;
+      this.previousPlayDuration = 0;
       this.mustResetOnNextPlay = false;
     }
     this.setState( { playbackStartTime: now, playbackInterval: setInterval(this.playbackEvent, this.recordingSpeed) });
@@ -121,6 +124,7 @@ class Cursor extends Component {
   
   stopPlayback = () => {
     clearInterval(this.state.playbackInterval);
+    this.previousPlayDuration = this.playDuration;
   }
 
   stopPlaybackAndSetupForReset = () => {

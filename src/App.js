@@ -1,6 +1,5 @@
 // TODO:
 //
-// Cursor: make it adjust for lag/timeshift and don't repeat same positions
 // Rewind: calculate steps/ rewindable time scrubber
 // Recording is additive, but you can start your recording all over again
 // Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Possibly, remove the first undo from getHistory and call setHistory
@@ -10,6 +9,7 @@
 // React preview window with REACT-ND's sample project
 // Some way to record DevTools and possibly interactions with the student React App
 
+// X Cursor: make it adjust for lag/timeshift and don't repeat same positions
 // X Switch to MS sampling in Cursor.js
 // X mode=neutral
 // X Current time display

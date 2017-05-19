@@ -24,7 +24,7 @@ class HistoryControl extends Component {
   handleOnChange = (e) => {
     var value = Number(e.target.value);
     this.setState({currentSliderValue:value});
-    this.props.scrub(value);
+    this.props.scrub(value, this.state.maxRange);
   }
 
   timeZeroPad(num) {

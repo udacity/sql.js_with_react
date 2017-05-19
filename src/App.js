@@ -44,21 +44,23 @@ class App extends Component {
   }
 
   stopPlayback = () => {
-    console.log('stopPlayback');
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
-    var newFarthestPointReached = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
+    var newFurthestPointReached = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     const newState = update(this.state, {
       mode: { $set: 'configuration' },
       playbackInfo: { 
         $merge: {
-          furthestPointReached: newFarthestPointReached
+          furthestPointReached: newFurthestPointReached
         }
       }
     });
     this.setState(newState);
+    console.log('stopPlayback just set state');
 
-    this.state.audioObj.pause();
+    if (this.state.audioObj) {
+      this.state.audioObj.pause();
+    }
     clearInterval(this.state.playbackInfo.timer);
   }
 
@@ -126,7 +128,7 @@ class App extends Component {
       playbackInfo: {
         $merge: {
           startTime: now,
-          timer: setInterval(this.updatePlaybackTimer, 10)
+          timer: setInterval(this.updatePlaybackTimer.bind(this), 10)
         }
       }
     });
@@ -140,6 +142,14 @@ class App extends Component {
     var totalPlayedBack = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     var newSliderValue = (( totalPlayedBack / this.state.recordingInfo.duration) * 1000);
     this.updateSlider(newSliderValue);
+/*
+    console.log('now:', now, 'startTime:', this.state.playbackInfo.startTime,
+                'furthestPointReached:', this.state.playbackInfo.furthestPointReached,
+                'playedBackThisTime:', playedBackThisTime, 
+                'totalPlayedBack:', totalPlayedBack, 
+                'newSliderValue:', newSliderValue,
+                'duration:', this.state.recordingInfo.duration);
+*/
     if (totalPlayedBack >= this.state.recordingInfo.duration) {
       console.log('Ending playback from updatePlaybackTimer');
       this.stopAndResetPlayback();
@@ -147,18 +157,28 @@ class App extends Component {
   }
 
   // Scrub to a particular location
-  scrub(value) {
-    this.stopPlayback();
-    this.setState({mode:'scrub', sliderValue: value});
+  scrub(value, sliderMaxRange) {
+    //this.stopPlayback();
+    var percentagePlayed = this.state.recordingInfo.duration * (value / sliderMaxRange);
     if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
-      this.furthestPointReached = this.state.recordingInfo.duration * value;
-      console.log('Scrubbed to time:',this.furthestPointReached);
+      const newState = update(this.state, {
+        mode: { $set: 'scrub' },
+        sliderValue: { $set: value },
+        playbackInfo: {
+          $merge: {
+            furthestPointReached: percentagePlayed
+          }
+        }
+      });
+      this.setState(newState);
+      this.state.audioObj.currentTime = percentagePlayed / 1000;
+      console.log('Scrubbed to time:',percentagePlayed, 'newState:', newState);
     }
   }
 
   updateSlider = (newSliderValue) => {
     this.setState({sliderValue: newSliderValue});
-    console.log('app.js: set sliderValue=', newSliderValue);
+    //console.log('app.js: set sliderValue=', newSliderValue);
   }
 
   render() {
@@ -169,7 +189,7 @@ class App extends Component {
        this.props.useHeader !== "0" ? <div className="App-header"><img src={logo} className="App-logo" alt="logo" /><h3>Session Recording Demo</h3></div> : null
       }
 
-      <Cursor id="cursor" mode={this.state.mode} endAllPlayback={this.endAllPlayback} />
+      <Cursor id="cursor" mode={this.state.mode} endAllPlayback={this.endAllPlayback} scrubPoint={this.state.playbackInfo.furthestPointReached}/>
 
       <Button 
         disabled={this.state.mode === 'playback' } 

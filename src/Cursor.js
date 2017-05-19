@@ -42,18 +42,22 @@ class Cursor extends Component {
           this.startPlayback();
           break;
         case 'scrub':
-          this.scrub();
+          this.scrub(nextProps.scrubPoint);
           break;
         case 'configuration':
           if (this.props.mode === 'playback') {
+            console.log('stopped mouse playback since went into config mode');
             this.stopPlayback();
           } else if (this.props.mode === 'recording') {
+            console.log('stopped mouse recording since went into config mode');
             this.stopRecording();
           }
           break;
         default:
           break;
       }
+    } else if (nextProps.mode === 'scrub' && nextProps.scrubPoint !== this.props.scrubPoint) {
+      this.scrub(nextProps.scrubPoint); // repeated scrubbing by user, while already in "scrub" mode
     }
   }
 
@@ -132,8 +136,23 @@ class Cursor extends Component {
     this.mustResetOnNextPlay = true;
   }
 
-  scrub = () => {
-    this.cursorMotionIndex = 0;
+  scrub = (scrubPoint) => {
+    console.log('cursor scrub, scrubPoint:', scrubPoint);
+    if (this.cursorMotion.length > 0) {
+      var scanAhead = 0;
+      while ((this.cursorMotion[scanAhead].t < scrubPoint) && (scanAhead < this.cursorMotion.length - 1)) {
+        //console.log('scanAhead:', scanAhead, 'playDuration:', playDuration, 'cursorMotionIndex:', this.cursorMotionIndex, 't:', this.cursorMotion[scanAhead].t);
+        ++scanAhead;
+      }
+      if (this.cursorMotion[scanAhead].t > scrubPoint) {
+        scanAhead = Math.max(0, scanAhead - 1);
+      }
+      console.log('cursor scrubbed to position:', scanAhead);
+      this.cursorMotionIndex = scanAhead;
+      this.previousPlayDuration = scrubPoint;
+      this.playDuration = 0;
+      this.mustResetOnNextPlay = false;
+    }
   }
   
   render() {

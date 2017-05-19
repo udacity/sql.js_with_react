@@ -131,7 +131,7 @@ class SimplerCodeMirror extends Component {
               this.cm.scrollTo(historyItem.record.left,historyItem.record.top);
               break;
             case 'selection':
-              console.log('cm selection activity during playback:', historyItem.record);
+              //console.log('cm selection activity during playback:', historyItem.record);
               this.cm.setSelection( 
                 { ch: historyItem.record.ch[0], line: historyItem.record.line[0] },
                 { ch: historyItem.record.ch[1], line: historyItem.record.line[1] }
@@ -145,14 +145,13 @@ class SimplerCodeMirror extends Component {
     }
   }
   
-  broken() {
-    console.log('here state is:', this.state);
+  broken = () => {
+    console.log('broken:', this.state);
   }
   
   playbackRecording = () => {
-    this.broken();
-    setTimeout(this.broken, 1000);
-
+//    this.broken();
+//    setTimeout(this.broken, 1000);
     console.log('Before running redos, we have history:', this.cm.getHistory());
     console.log('changeCount = ', this.state.changeCount);
 
@@ -167,7 +166,7 @@ class SimplerCodeMirror extends Component {
 
   recordAction = (cm, action) => {
     var history = cm.getHistory();
-    if (this.props.recording) {
+    if (this.props.mode === 'recording') {
       console.log('recordAction: action:', action, 'history:', history.done.length);
       var timeOffset = new Date().getTime() - this.state.recordingStartTime;
       var historyItem = {

@@ -100,6 +100,7 @@ class SimplerCodeMirror extends Component {
   playHistory = () => {
     if (this.lastPlayMarker === this.history.length) {
       console.log('End CM playback.');
+      this.lastPlayMarker = this.history.length - 1; // back off from the very end so we can scrub successfully
       this.stopPlayback();
     } else {
       var nextAction = this.history[this.lastPlayMarker];
@@ -140,7 +141,18 @@ class SimplerCodeMirror extends Component {
   
   jumpToScrubPoint() {
     if (this.scrubStepCount > 0) {
-      ((this.scrubDirection === 'forward') ? this.cm.redo() : this.cm.undo());
+      var currentHistoryItem = this.history[this.lastPlayMarker];
+      if (this.scrubDirection === 'forward') {
+        if (currentHistoryItem.type === 'change') { // make sure you only redo change steps in the history
+          this.cm.redo();
+        }
+        this.lastPlayMarker++;
+      } else {
+        if (currentHistoryItem.type === 'change') {  // make sure you only undo change steps in the history
+          this.cm.undo();
+        }
+        this.lastPlayMarker--;
+      }
       this.scrubStepCount--;
     }
     if (this.scrubStepCount === 0) {
@@ -164,8 +176,7 @@ class SimplerCodeMirror extends Component {
       this.scrubStepCount = Math.abs(scrubStepCountRaw);
       console.log('Setting up to adjust cm history scrubbed to position:', scan, 'numSteps:', this.scrubStepCount, 'direction:', this.scrubDirection);
       this.scrubInterval = setInterval(this.jumpToScrubPoint.bind(this), 10);
-      this.lastPlayMarker = scan;
-      this.furthestPointReached = scrubPoint;
+      this.furthestPointReached = scrubPoint; // scrubPoint is a time value in ms
     }
   }
   

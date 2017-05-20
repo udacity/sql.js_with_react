@@ -210,7 +210,7 @@ class Xterm extends Component {
   }
   
   jumpToScrubPoint() {
-    if (this.historyIndex > this.stopHistory) {
+    if (this.historyIndex >= this.stopHistory) {
       clearInterval(this.scrubInterval);
     } else {
       this.writeHistoryRecordToXterm(this.history[this.historyIndex++],true);

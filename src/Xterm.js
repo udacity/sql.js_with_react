@@ -92,19 +92,18 @@ class Xterm extends Component {
 
     this.term.open(terminalContainer, { focus: true } );
 
-    this.term.viewport.viewportElement.addEventListener('scroll', function(e) {
+    this.term.viewport.viewportElement.addEventListener('scroll', (e) => {
       //console.log('scroll:', e);
       var target = e.target;
       var scrollTop = target.scrollTop;
       //console.log('scrollTop:', scrollTop);
-      fetch(`${host.httpHost}/terminal/history/record/scroll`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify({scrollTop:scrollTop})
-      });
+      var now = new Date().getTime();
+      var dataRecord = {
+        type: 'scroll',
+        data: scrollTop,
+        timeOffset: now - this.recordingStartTime
+      }
+      this.history.push(dataRecord);
     });
 
     var initialGeometry = this.term.proposeGeometry();

@@ -9,14 +9,10 @@ import React, { Component } from 'react';
 class Xterm extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      history:[],
-      historyIndex: undefined,
-      replayInterval: undefined,
-      replayStartTime: undefined,
-      resetOnNextPlay:false,
-      pid: undefined
-    }
+    this.pid = undefined;
+    this.replayStartTime = undefined;
+    this.resetOnNextPlay = false;
+    this.furthestPointReached = 0;
   }
 
   getXtermHost() {
@@ -38,18 +34,33 @@ class Xterm extends Component {
     if (this.props.mode !== nextProps.mode) {
       switch (nextProps.mode) {
         case 'recording':
-          this.resetRecording();
+          if (this.props.mode === 'playback') {
+            this.stopPlayback();
+          }
+          this.startRecording();
           break;
         case 'playback':
+          if (this.props.mode === 'recording') {
+            this.stopRecording();
+          }
           this.startPlayback();
+          break;
+        case 'scrub':
+          this.scrub(nextProps.scrubPoint);
           break;
         case 'configuration':
         default:
           if (this.props.mode === 'playback') {
+            console.log('stopped xterm playback since went into config mode');
             this.stopPlayback();
+          } else if (this.props.mode === 'recording') {
+            console.log('stopped xterm recording since went into config mode');
+            this.stopRecording();
           }
           break;
       }
+    } else if ((this.props.mode === 'scrub') && (nextProps.scrubPoint !== this.props.scrubPoint)) {
+      this.scrub(nextProps.scrubPoint);
     }
   }
   
@@ -69,12 +80,12 @@ class Xterm extends Component {
 
     this.term.on('resize', (size) => {
       console.log('resizing');
-      if (!this.state.pid) {
+      if (!this.pid) {
         return;
       }
       var cols = size.cols,
           rows = size.rows,
-          url = `${host.httpHost}/terminals/${this.state.pid}/size?cols=${cols}&rows=${rows}`;
+          url = `${host.httpHost}/terminals/${this.pid}/size?cols=${cols}&rows=${rows}`;
 
       fetch(url, {method: 'POST'});
     });
@@ -103,81 +114,130 @@ class Xterm extends Component {
     fetch(`${host.httpHost}/terminals?cols=${cols}&rows=${rows}`, {method: 'POST'})
       .then(res => res.text()).then((pid) => { 
         this.term.fit();
-        this.setState({pid: pid});
+        this.pid = pid;
         console.log('got pid:', pid);
         var socketUrl = host.socketUrl + pid;
         console.log('opening socket to :', socketUrl);
         this.socket = new WebSocket(socketUrl);
-        this.socket.onopen = this.runRealTerminal;
+        this.socket.onopen = this.runRealTerminal.bind(this);
+        this.socket.onmessage = this.interceptData.bind(this);
       });
-
-    this.resetRecording();
 
   }
   
-  runRealTerminal = () => {
+  interceptData(message) {
+    if (this.firstMessageReceived === undefined) {
+      this.firstMessageReceived = message.data;
+    }
+    if (this.props.mode === 'recording') {
+      var now = new Date().getTime();
+      var dataRecord = {
+        type: 'data',
+        data: message.data,
+        timeOffset: now - this.recordingStartTime
+      }
+      this.history.push(dataRecord);
+    }
+  }
+  
+  runRealTerminal() {
     console.log('attaching...');
     this.term.attach(this.socket);
     this.term._initialized = true;
   }
 
-  resetRecording() {
-    this.setState({history:[], historyIndex: 0});
-    const host = this.getXtermHost();
-    fetch(`${host.httpHost}/terminal/history/reset`);
+  startRecording() {
+    console.log('xterm started recording');
+    this.history = [];
+    this.lastPlayMarker = 0;
+    this.recordingStartTime = new Date().getTime();
+    this.furthestPointReached = 0;
   }
 
-  stopPlayback() {
-    console.log('Stopping xterm playback');
-    clearInterval(this.state.replayInterval);
+  stopRecording() {
+    console.log('xterm stopped recording');
+    this.resetOnNextPlay = true;
+    this.historyIndex = 0;
   }
-  
-  playHistory = () => {
-    if (this.state.historyIndex === this.state.history.length) {
+
+  writeHistoryRecordToXterm(historyItem, ignoreScrolling) {
+    if (historyItem.type === 'data') {
+      this.term.viewport.viewportElement.click();
+      this.term.write(historyItem.data);
+      //console.log('Data history:',historyItem);
+    } else if (!ignoreScrolling && historyItem.type === 'scroll') {
+      //console.log('Scrolling during playback to: ', historyItem.data);
+      var scrollTop = historyItem.data;
+      this.term.viewport.viewportElement.scrollTop = scrollTop;
+    }
+  }
+
+  playHistory() {
+    if (this.historyIndex === this.history.length) {
       console.log('Xterm playback done.');
-      this.setState({resetOnNextPlay: true});
+      this.resetOnNextPlay = true;
       this.stopPlayback();
     } else {
-      // console.log('Playing xterm history');
-      var nextAction = this.state.history[this.state.historyIndex];
-      var timeDiff = new Date().getTime() - this.state.replayStartTime;
+      console.log('Playing xterm history');
+      var nextAction = this.history[this.historyIndex];
+      var timeDiff = new Date().getTime() - this.replayStartTime + this.furthestPointReached;
       if (timeDiff > nextAction.timeOffset) {
-        var historyItem = this.state.history[this.state.historyIndex++];
-        if (historyItem.type === 'data') {
-          this.term.viewport.viewportElement.click();
-          this.term.write(historyItem.data);
-          //console.log('Data history:',historyItem);
-        } else if (historyItem.type === 'scroll') {
-          //console.log('Scrolling during playback to: ', historyItem.data);
-          var scrollTop = historyItem.data;
-          this.term.viewport.viewportElement.scrollTop = scrollTop;
-        }
+        var historyItem = this.history[this.historyIndex++];
+        this.writeHistoryRecordToXterm(historyItem, false);
       }
     }
   }
 
   startPlayback() {
-    if (this.state.history.length > 0) {
+    var now = new Date().getTime();
+    if (this.history.length > 0) {
+      console.log('xterm history:', this.history);
       this.term.viewport.viewportElement.click();
-      if (this.state.resetOnNextPlay) {
+      if (this.resetOnNextPlay) {
         this.term.reset();
-        this.setState({historyIndex:0});
+        this.historyIndex = 0;
+        this.term.viewport.viewportElement.click();
+        this.term.write(this.firstMessageReceived);
       }
-      this.setState({resetOnNextPlay: false, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
-    } else {
-      const host = this.getXtermHost();
-      fetch(`${host.httpHost}/terminal/history/all`)
-        .then(response => response.json() )
-        .then(data => { 
-          //console.log('Got history:', data);
-          this.term.viewport.viewportElement.click();
-          this.term.reset();
-          //console.log('Got history:', data);
-          this.setState({history: data, historyIndex:0, replayStartTime: new Date().getTime(), replayInterval: setInterval(this.playHistory, 50)});
-        });
+      this.resetOnNextPlay = false;
+      this.replayStartTime = now;
+      this.replayInterval = setInterval(this.playHistory.bind(this), 50);
     }
   }
 
+  stopPlayback() {
+    console.log('Stopping xterm playback');
+    clearInterval(this.replayInterval);
+  }
+  
+  jumpToScrubPoint() {
+    if (this.historyIndex > this.stopHistory) {
+      clearInterval(this.scrubInterval);
+    } else {
+      this.writeHistoryRecordToXterm(this.history[this.historyIndex++],true);
+    }
+  }
+
+  scrub(scrubPoint) {
+    console.log('xterm scrubbing to:', scrubPoint);
+    if (this.history.length > 0) {
+      var scan = 0;
+      while ((this.history[scan].timeOffset < scrubPoint) && (scan < this.history.length - 1)) {
+        ++scan;
+      }
+      if (this.history[scan].timeOffset > scrubPoint) {
+        scan = Math.max(0, scan - 1);
+      }
+      this.historyIndex = 0;
+      this.stopHistory = scan;
+      this.resetOnNextPlay = false;
+      this.term.reset();
+      this.term.write(this.firstMessageReceived);
+      this.furthestPointReached = scrubPoint;
+      this.scrubInterval = setInterval(this.jumpToScrubPoint.bind(this), 1);
+    }
+  }
+  
   render() {
     return  (
       <div>

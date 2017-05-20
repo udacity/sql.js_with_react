@@ -190,7 +190,7 @@ class App extends Component {
        this.props.useHeader !== "0" ? <div className="App-header"><img src={logo} className="App-logo" alt="logo" /><h3>Session Recording Demo</h3></div> : null
       }
 
-      <Cursor id="cursor" mode={this.state.mode} endAllPlayback={this.endAllPlayback} scrubPoint={this.state.playbackInfo.furthestPointReached}/>
+      <Cursor id="cursor" mode={this.state.mode} scrubPoint={this.state.playbackInfo.furthestPointReached}/>
 
       <Button 
         disabled={this.state.mode === 'playback' } 
@@ -209,13 +209,12 @@ class App extends Component {
       <SimplerCodeMirror 
         mode={this.state.mode} 
         scrubPoint={this.state.playbackInfo.furthestPointReached}
-        endAllPlayback={this.endAllPlayback} 
         options={this.state.cmOptions}
       />
 
       <Xterm 
         mode={this.state.mode} 
-        endAllPlayback={this.endAllPlayback} 
+        scrubPoint={this.state.playbackInfo.furthestPointReached}
       />
 
       <HistoryControl 

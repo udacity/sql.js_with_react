@@ -169,14 +169,16 @@ class SimplerCodeMirror extends Component {
     }
   }
   
-  playbackRecording = () => {
-    console.log('Before running redos, we have history:', this.cm.getHistory());
-    this.cm.setOption("readOnly",  true );
+  playbackRecording() {
+    if (this.history.length > 0) {
+      console.log('Before running redos, we have history:', this.cm.getHistory());
+      this.cm.setOption("readOnly",  true );
 
-    console.log('replaying changes at correct speed');
-    this.cm.setCursor(this.initialCursorPos);
-    this.replayStartTime = new Date().getTime();
-    this.replayInterval = setInterval(this.playHistory.bind(this), 1);
+      console.log('replaying changes at correct speed');
+      this.cm.setCursor(this.initialCursorPos);
+      this.replayStartTime = new Date().getTime();
+      this.replayInterval = setInterval(this.playHistory.bind(this), 1);
+    }
   }
 
   recordAction = (cm, action) => {

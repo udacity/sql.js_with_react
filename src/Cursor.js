@@ -136,7 +136,7 @@ class Cursor extends Component {
     this.mustResetOnNextPlay = true;
   }
 
-  scrub = (scrubPoint) => {
+  scrub (scrubPoint) {
     console.log('cursor scrub, scrubPoint:', scrubPoint);
     if (this.cursorMotion.length > 0) {
       var scanAhead = 0;

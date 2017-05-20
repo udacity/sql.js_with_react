@@ -59,8 +59,8 @@ class App extends Component {
     this.setState(newState);
     console.log('stopPlayback just set state');
 
-    if (this.state.audioObj) {
-      this.state.audioObj.pause();
+    if (this.audioObj) {
+      this.audioObj.pause();
     }
     clearInterval(this.state.playbackInfo.timer);
   }
@@ -78,7 +78,7 @@ class App extends Component {
   }
   
   saveAudioForPlayback(audioObj) {
-    this.setState({audioObj:audioObj});
+    this.audioObj = audioObj;
   }
 
   startRecording() {
@@ -134,7 +134,7 @@ class App extends Component {
       }
     });
     this.setState(newState);
-    this.state.audioObj.play();
+    this.audioObj.play();
   }
 
   updatePlaybackTimer = () => {
@@ -172,7 +172,7 @@ class App extends Component {
         }
       });
       this.setState(newState);
-      this.state.audioObj.currentTime = percentagePlayed / 1000;
+      this.audioObj.currentTime = percentagePlayed / 1000;
       console.log('Scrubbed to time:',percentagePlayed, 'newState:', newState);
     }
   }
@@ -208,6 +208,7 @@ class App extends Component {
 
       <SimplerCodeMirror 
         mode={this.state.mode} 
+        scrubPoint={this.state.playbackInfo.furthestPointReached}
         endAllPlayback={this.endAllPlayback} 
         options={this.state.cmOptions}
       />

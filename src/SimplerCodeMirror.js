@@ -12,6 +12,7 @@ class SimplerCodeMirror extends Component {
     this.lastPlayMarker = 0;
     this.exampleJs = '// loading... '
     this.scrubPoint = 0;
+    this.postScrubAction = undefined;
   }
 
   componentDidMount() {
@@ -42,6 +43,7 @@ class SimplerCodeMirror extends Component {
           break;
         case 'scrub':
           this.scrub(nextProps.scrubPoint);
+          this.resetOnNextPlay = false;
           break;
         case 'configuration':
           if (this.props.mode === 'recording') {
@@ -101,6 +103,7 @@ class SimplerCodeMirror extends Component {
     if (this.lastPlayMarker === this.history.length) {
       console.log('End CM playback.');
       this.lastPlayMarker = this.history.length - 1; // back off from the very end so we can scrub successfully
+      this.resetOnNextPlay = true;
       this.stopPlayback();
     } else {
       var nextAction = this.history[this.lastPlayMarker];
@@ -157,6 +160,11 @@ class SimplerCodeMirror extends Component {
     }
     if (this.scrubStepCount === 0) {
       clearInterval(this.scrubInterval);
+      if (this.postScrubAction !== undefined) {
+        console.log('Running postScrubAction');
+        this.postScrubAction();
+        this.postScrubAction = undefined;
+      }
     }
   }
 
@@ -175,8 +183,8 @@ class SimplerCodeMirror extends Component {
       this.scrubDirection = (scrubStepCountRaw < 0 ? 'forward' : 'backward');
       this.scrubStepCount = Math.abs(scrubStepCountRaw);
       console.log('Setting up to adjust cm history scrubbed to position:', scan, 'numSteps:', this.scrubStepCount, 'direction:', this.scrubDirection);
-      this.scrubInterval = setInterval(this.jumpToScrubPoint.bind(this), 10);
       this.furthestPointReached = scrubPoint; // scrubPoint is a time value in ms
+      this.scrubInterval = setInterval(this.jumpToScrubPoint.bind(this), 10);
     }
   }
   
@@ -188,7 +196,12 @@ class SimplerCodeMirror extends Component {
       console.log('replaying changes at correct speed');
       this.cm.setCursor(this.initialCursorPos);
       this.replayStartTime = new Date().getTime();
-      this.replayInterval = setInterval(this.playHistory.bind(this), 1);
+      if (this.resetOnNextPlay) {
+        this.postScrubAction = () => { this.replayInterval = setInterval(this.playHistory.bind(this),1) };
+        this.scrub(0);
+      } else {
+        this.replayInterval = setInterval(this.playHistory.bind(this), 1);
+      }
     }
   }
 

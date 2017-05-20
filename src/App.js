@@ -1,15 +1,15 @@
 // TODO:
 //
-// Scrub: calculate steps/ rewindable time scrubber
+// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Or accelerate it to catch up if needed.
 // Display recorded time so far
 // Recording is additive, but you can start your recording all over again
-// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Possibly, remove the first undo from getHistory and call setHistory
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
 // Fork this code
 // 
 // React preview window with REACT-ND's sample project
 // Some way to record DevTools and possibly interactions with the student React App
 
+// X Scrub: calculate steps/ rewindable time scrubber
 // X Cursor: make it adjust for lag/timeshift and don't repeat same positions
 // X Switch to MS sampling in Cursor.js
 // X mode=neutral

@@ -144,14 +144,20 @@ class SimplerCodeMirror extends Component {
   
   jumpToScrubPoint() {
     if (this.scrubStepCount > 0) {
-      var currentHistoryItem = this.history[this.lastPlayMarker];
-      // Replay only changes and scrolls, not cursor activity or selections.
-      if (currentHistoryItem.type === 'change') { // make sure you only redo change steps in the history
+      var historyitem = this.history[this.lastPlayMarker];
+      if (historyitem.type === 'change') { // make sure you only redo change steps in the history
         (this.scrubDirection === 'forward') ? this.cm.redo() : this.cm.undo();
-      } else if (currentHistoryItem.type === 'scroll') {
-        this.cm.scrollTo(currentHistoryItem.record.left, currentHistoryItem.record.top);
+      } else if (historyitem.type === 'scroll') {
+        this.cm.scrollTo(historyitem.record.left, historyitem.record.top);
+      } else if (historyitem.type === 'cursorActivity') {
+        if (historyitem.record.position !== undefined) {
+          this.cm.setCursor({line: historyitem.record.position.line, ch: historyitem.record.position.ch});
+        }
+      } else if (historyitem.type === 'selection') {
+        (this.scrubDirection === 'forward') ? this.cm.redoSelection() : this.cm.undoSelection();
       }
       (this.scrubDirection === 'forward') ? this.lastPlayMarker++ : this.lastPlayMarker--;
+
       this.scrubStepCount--;
     }
     if (this.scrubStepCount === 0) {

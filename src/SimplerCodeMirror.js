@@ -145,17 +145,13 @@ class SimplerCodeMirror extends Component {
   jumpToScrubPoint() {
     if (this.scrubStepCount > 0) {
       var currentHistoryItem = this.history[this.lastPlayMarker];
-      if (this.scrubDirection === 'forward') {
-        if (currentHistoryItem.type === 'change') { // make sure you only redo change steps in the history
-          this.cm.redo();
-        }
-        this.lastPlayMarker++;
-      } else {
-        if (currentHistoryItem.type === 'change') {  // make sure you only undo change steps in the history
-          this.cm.undo();
-        }
-        this.lastPlayMarker--;
+      // Replay only changes and scrolls, not cursor activity or selections.
+      if (currentHistoryItem.type === 'change') { // make sure you only redo change steps in the history
+        (this.scrubDirection === 'forward') ? this.cm.redo() : this.cm.undo();
+      } else if (currentHistoryItem.type === 'scroll') {
+        this.cm.scrollTo(currentHistoryItem.record.left, currentHistoryItem.record.top);
       }
+      (this.scrubDirection === 'forward') ? this.lastPlayMarker++ : this.lastPlayMarker--;
       this.scrubStepCount--;
     }
     if (this.scrubStepCount === 0) {

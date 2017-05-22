@@ -22,6 +22,13 @@ class SimplerCodeMirror extends Component {
         var textAreaNode = this.findDOMNode(this.refs.textarea);
         this.cm = this.CodeMirror.fromTextArea(textAreaNode, this.props.options);
         this.cm.setValue(data);
+
+        // Remove first setValue() from history so that can never be undone
+        var history = this.cm.getHistory();
+        history.done.shift();
+        history.done.shift();
+        this.cm.setHistory(history);
+
         this.cm.on('change', this.handleChange);
         this.cm.on('cursorActivity', this.handleCursorActivity);
         this.cm.on('scroll', this.handleScroll);
@@ -84,10 +91,6 @@ class SimplerCodeMirror extends Component {
     //var history = this.cm.getHistory();
     console.log('Stopped Cm recording, history:', this.history);
     // Remove the first load up steps from the history so we can't undo too far
-    var history = this.cm.getHistory();
-    history.done.shift();
-    history.done.shift();
-    this.cm.setHistory(history);
     this.lastPlayMarker = this.history.length - 1;
     this.scrub(0);
   }

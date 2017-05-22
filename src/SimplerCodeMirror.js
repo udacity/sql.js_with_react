@@ -228,8 +228,8 @@ class SimplerCodeMirror extends Component {
   }
   
   handleChange = (cm,action) => {
-    //console.log('Change:');
-    //console.log(cm,action);
+    console.log('Change:');
+    console.log(cm,action);
     //console.log(cm.getCursor(), cm.getValue());
     //cm.setCursor({line:2, ch:2});
     //var history = cm.getHistory();

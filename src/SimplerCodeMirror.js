@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import '../node_modules/codemirror/mode/javascript/javascript';
+//var jsdiff = require('diff');
 
 class SimplerCodeMirror extends Component {
 
@@ -21,6 +22,12 @@ class SimplerCodeMirror extends Component {
       .then(data => {
         var textAreaNode = this.findDOMNode(this.refs.textarea);
         this.cm = this.CodeMirror.fromTextArea(textAreaNode, this.props.options);
+        var myVal = '';
+        for (var i = 0; i < 20; ++i) {
+          myVal += i + ' ' + i * 2 + "\n";
+        }
+        myVal = "abc\ndef\n";
+        //this.cm.setValue(myVal);
         this.cm.setValue(data);
 
         // Remove first setValue() from history so that can never be undone
@@ -36,6 +43,9 @@ class SimplerCodeMirror extends Component {
         window.cm.focus(); 
         var cursorInfo = this.cm.getCursor();
         console.log('at startup, cursorInfo:', cursorInfo);
+        //        var str1 = 'Hello';
+        //        var str2 = 'Jello';
+        //        console.log('Diff two strings:', jsdiff.diffChars(str1, str2));
       });
   }  
 
@@ -81,6 +91,7 @@ class SimplerCodeMirror extends Component {
       initialCursorPos = this.cm.getCursor();
     }
     this.history = [];
+    this.firstChangeMarker = undefined;
     this.initialCmContents = initialCmContents;
     this.initialCursorPos = initialCursorPos;
     this.recordingStartTime = now;
@@ -102,6 +113,39 @@ class SimplerCodeMirror extends Component {
     this.furthestPointReached = new Date().getTime() - this.replayStartTime;
   }
   
+  undoChange(historyItem) {
+    var record = historyItem.record;
+
+    if (record.removed.length > 0) {
+      console.log('replacing selected chars');
+      var thisRange = { line: record.to.line, ch: record.from.ch + record.text.length };
+      this.cm.doc.replaceRange('', record.from, thisRange, 'playback')
+      this.cm.doc.replaceRange(record.removed, record.from, undefined, 'playback');
+    } else {
+      console.log('removing inserted chars');
+      this.cm.doc.replaceRange(record.removed, record.from, record.to, 'playback');
+    }
+
+    
+  }
+  
+  resetToInitialContents() {
+    var currentScroll = this.cm.getScrollInfo();
+    this.cm.setValue(this.initialCmContents);
+    this.cm.scrollTo(currentScroll.left, currentScroll.top);
+  }
+  
+  rerunChange(historyItem) {
+    var record = historyItem.record;
+    console.log('playing back new text');
+    //this.cm.doc.replaceRange(record.text, record.from,record.to, 'playback');
+    var currentScroll = this.cm.getScrollInfo();
+    var cursorInfo = this.cm.getCursor();
+    this.cm.setValue(record.contents);
+    this.cm.scrollTo(currentScroll.left, currentScroll.top);
+    this.cm.setCursor(cursorInfo);
+  }
+
   playHistory = () => {
     if (this.lastPlayMarker === this.history.length) {
       console.log('End CM playback.');
@@ -119,7 +163,8 @@ class SimplerCodeMirror extends Component {
         switch(historyItem.type) {
           case 'change':
             //console.log('change history during playback:',historyItem);
-            this.cm.redo();
+            //this.cm.redo();
+            this.rerunChange(historyItem);
             break;
           case 'cursorActivity':
             //console.log('cm cursor activity during playback: ', historyItem.record);
@@ -147,19 +192,23 @@ class SimplerCodeMirror extends Component {
   
   jumpToScrubPoint() {
     if (this.scrubStepCount > 0) {
-      var historyitem = this.history[this.lastPlayMarker];
-      if (historyitem.type === 'change') { // make sure you only redo change steps in the history
-        (this.scrubDirection === 'forward') ? this.cm.redo() : this.cm.undo();
-      } else if (historyitem.type === 'scroll') {
-        this.cm.scrollTo(historyitem.record.left, historyitem.record.top);
-      } else if (historyitem.type === 'cursorActivity') {
-        if (historyitem.record.position !== undefined) {
-          this.cm.setCursor({line: historyitem.record.position.line, ch: historyitem.record.position.ch});
+      var historyItem = this.history[this.lastPlayMarker];
+      if (historyItem.type === 'change') { // make sure you only redo change steps in the history
+        //(this.scrubDirection === 'forward') ? this.rerunChange(historyItem) : this.rerunChange(historyItem);
+        this.rerunChange(historyItem);
+      } else if (historyItem.type === 'scroll') {
+        this.cm.scrollTo(historyItem.record.left, historyItem.record.top);
+      } else if (historyItem.type === 'cursorActivity') {
+        if (historyItem.record.position !== undefined) {
+          this.cm.setCursor({line: historyItem.record.position.line, ch: historyItem.record.position.ch});
         }
-      } else if (historyitem.type === 'selection') {
-        (this.scrubDirection === 'forward') ? this.cm.redoSelection() : this.cm.undoSelection();
       }
       (this.scrubDirection === 'forward') ? this.lastPlayMarker++ : this.lastPlayMarker--;
+      if (this.scrubDirection === 'backward') {
+        if (this.lastPlayMarker < this.firstChangeMarker) {
+          this.resetToInitialContents();
+        }
+      }
 
       this.scrubStepCount--;
     }
@@ -221,25 +270,47 @@ class SimplerCodeMirror extends Component {
         timeOffset: timeOffset
       }
       console.log('Recording codemirror history:', historyItem);
+      /*
       if ((this.lastActionType !== undefined) && (this.lastActionType === 'change') && (action.type === 'cursorActivity')) {
         console.log('Not logging cursor activity due to change');
       } else {
         this.history.push(historyItem);
       }
+      */
+      this.history.push(historyItem);
       this.lastActionType = action.type;
     }
   }
   
   handleChange = (cm,action) => {
-    console.log('Change:');
-    console.log(cm,action);
-    //console.log(cm.getCursor(), cm.getValue());
-    //cm.setCursor({line:2, ch:2});
-    //var history = cm.getHistory();
-    //console.log('onchange, history:', history);
-    // var bigJs = "// This is a for loop in Javascript\n// Here's somre more comments\n// And even more comments\n// Wowo\nfor (var i = 0; i < 10; ++i) {\n  console.log(i);\n}\n"
-    //console.log('recording =', this.props.recording);
-    this.recordAction(cm,{ type: 'change', record: {} });
+    console.log('Change:',action);
+    if (action.origin === 'playback') {
+      console.log('Ignoring this change since it came from a recorded playback.');
+    } else {
+/*
+      var cmAction = {
+        type: 'change',
+        record: {
+          from: action.from,
+          to:   action.to,
+          text: action.text,
+          removed: action.removed,
+          origin: 'playback'
+        }
+      }
+*/
+      var cmAction = {
+        type: 'change',
+        record: {
+          contents: this.cm.getValue(),
+          origin: 'playback'
+        }
+      }
+      this.recordAction(cm,cmAction);
+      if (this.firstChangeMarker === undefined) {
+        this.firstChangeMarker = this.history.length - 1; // remember when first change happened;
+      }
+    }
   }
 
   handleCursorActivity = (cm) => {

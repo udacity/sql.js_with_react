@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import '../node_modules/codemirror/mode/javascript/javascript';
-//var jsdiff = require('diff');
 
 class SimplerCodeMirror extends Component {
 
@@ -43,9 +42,6 @@ class SimplerCodeMirror extends Component {
         window.cm.focus(); 
         var cursorInfo = this.cm.getCursor();
         console.log('at startup, cursorInfo:', cursorInfo);
-        //        var str1 = 'Hello';
-        //        var str2 = 'Jello';
-        //        console.log('Diff two strings:', jsdiff.diffChars(str1, str2));
       });
   }  
 
@@ -113,21 +109,6 @@ class SimplerCodeMirror extends Component {
     this.furthestPointReached = new Date().getTime() - this.replayStartTime;
   }
   
-  undoChange(historyItem) {
-    var record = historyItem.record;
-
-    if (record.removed.length > 0) {
-      console.log('replacing selected chars');
-      var thisRange = { line: record.to.line, ch: record.from.ch + record.text.length };
-      this.cm.doc.replaceRange('', record.from, thisRange, 'playback')
-      this.cm.doc.replaceRange(record.removed, record.from, undefined, 'playback');
-    } else {
-      console.log('removing inserted chars');
-      this.cm.doc.replaceRange(record.removed, record.from, record.to, 'playback');
-    }
-
-    
-  }
   
   resetToInitialContents() {
     var currentScroll = this.cm.getScrollInfo();
@@ -135,7 +116,7 @@ class SimplerCodeMirror extends Component {
     this.cm.scrollTo(currentScroll.left, currentScroll.top);
   }
   
-  rerunChange(historyItem) {
+  runChange(historyItem) {
     var record = historyItem.record;
     console.log('playing back new text');
     //this.cm.doc.replaceRange(record.text, record.from,record.to, 'playback');
@@ -163,8 +144,7 @@ class SimplerCodeMirror extends Component {
         switch(historyItem.type) {
           case 'change':
             //console.log('change history during playback:',historyItem);
-            //this.cm.redo();
-            this.rerunChange(historyItem);
+            this.runChange(historyItem);
             break;
           case 'cursorActivity':
             //console.log('cm cursor activity during playback: ', historyItem.record);
@@ -194,12 +174,12 @@ class SimplerCodeMirror extends Component {
     if (this.scrubStepCount > 0) {
       var historyItem = this.history[this.lastPlayMarker];
       if (historyItem.type === 'change') { // make sure you only redo change steps in the history
-        //(this.scrubDirection === 'forward') ? this.rerunChange(historyItem) : this.rerunChange(historyItem);
-        this.rerunChange(historyItem);
+        this.runChange(historyItem);
       } else if (historyItem.type === 'scroll') {
         this.cm.scrollTo(historyItem.record.left, historyItem.record.top);
       } else if (historyItem.type === 'cursorActivity') {
         if (historyItem.record.position !== undefined) {
+          this.cm.focus();
           this.cm.setCursor({line: historyItem.record.position.line, ch: historyItem.record.position.ch});
         }
       }
@@ -213,6 +193,7 @@ class SimplerCodeMirror extends Component {
       this.scrubStepCount--;
     }
     if (this.scrubStepCount === 0) {
+      this.runChange(historyItem);
       clearInterval(this.scrubInterval);
       if (this.postScrubAction !== undefined) {
         console.log('Running postScrubAction');
@@ -287,18 +268,6 @@ class SimplerCodeMirror extends Component {
     if (action.origin === 'playback') {
       console.log('Ignoring this change since it came from a recorded playback.');
     } else {
-/*
-      var cmAction = {
-        type: 'change',
-        record: {
-          from: action.from,
-          to:   action.to,
-          text: action.text,
-          removed: action.removed,
-          origin: 'playback'
-        }
-      }
-*/
       var cmAction = {
         type: 'change',
         record: {

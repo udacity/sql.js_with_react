@@ -20,12 +20,14 @@ class HistoryControl extends Component {
   handleOnChange(e) {
     var value = Number(e.target.value);
     this.setState({currentSliderValue:value});
+    console.log('change complete, scrubbing to :', value);
+    this.props.scrub(value, this.state.maxRange);
   }
 
   handleOnChangeComplete(e) {
     var value = Number(e.target.value);
     console.log('change complete, scrubbing to :', value);
-    this.props.scrub(value, this.state.maxRange);
+    // 
   }
   
   timeZeroPad(num) {

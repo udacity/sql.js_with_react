@@ -1,6 +1,6 @@
 // TODO:
 //
-// Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Or accelerate it to catch up if needed.
+// Make CM rewind smarter by jumping right to the right spot rather than rewinding everything.
 // Display recorded time so far
 // Recording is additive, but you can start your recording all over again
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
@@ -9,6 +9,8 @@
 // React preview window with REACT-ND's sample project
 // Some way to record DevTools and possibly interactions with the student React App
 
+// X Cursor scrubbing
+// X Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Or accelerate it to catch up if needed.
 // X Scrub: calculate steps/ rewindable time scrubber
 // X Cursor: make it adjust for lag/timeshift and don't repeat same positions
 // X Switch to MS sampling in Cursor.js

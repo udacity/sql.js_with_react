@@ -147,11 +147,12 @@ class Cursor extends Component {
       if (this.cursorMotion[scanAhead].t > scrubPoint) {
         scanAhead = Math.max(0, scanAhead - 1);
       }
-      console.log('cursor scrubbed to position:', scanAhead);
       this.cursorMotionIndex = scanAhead;
       this.previousPlayDuration = scrubPoint;
-      this.playDuration = 0;
       this.mustResetOnNextPlay = false;
+      var position = this.cursorMotion[this.cursorMotionIndex];
+      // console.log('cursor scrub position:', position, 'from position:', this.cursorMotionIndex);
+      this.setState({position: position});
     }
   }
   

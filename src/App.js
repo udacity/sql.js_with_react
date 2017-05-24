@@ -1,7 +1,8 @@
 // TODO:
 //
+// Store recording as json into textarea
 // Save CM contents to file so we can actually preview the react project
-// React preview window with REACT-ND's sample project, with host:port shown
+// React preview window with REACT-ND's sample project, with host:port shown. Use node proxy ? or maybe just my xterm server to transfer file saves over
 // Fork the code. Your version is whole separate panel
 // Recording is additive, but you can start your recording all over again
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md

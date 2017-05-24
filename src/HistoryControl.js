@@ -35,11 +35,8 @@ class HistoryControl extends Component {
     return(strNum.length < 2 ? '0' + strNum : strNum);
   }
 
-  computeCurrentTime = () => {
-    if (this.props.duration === undefined) {
-      return('--:--:--');
-    }
-    const currentTimeMilliseconds = this.props.duration * (this.state.currentSliderValue / this.state.maxRange);
+  formatPlayRecordTime(duration, proportion) {
+    const currentTimeMilliseconds = duration * proportion;
     const currentTimeSeconds = currentTimeMilliseconds / 1000;
     const computedHour = Math.floor(currentTimeSeconds / 3600);
     const computedMinutes = Math.floor((currentTimeSeconds - (computedHour * 3600)) / 60);
@@ -52,6 +49,14 @@ class HistoryControl extends Component {
     const currentTimeFormatted = `${displayHour}:${displayMinutes}:${displaySeconds}:${displayMilliseconds}`;
     return(currentTimeFormatted);    
   }
+
+  computeCurrentRecordingTime() {
+    return(this.formatPlayRecordTime(this.props.duration, 1.0));    
+  }
+
+  computeCurrentPlayTime() {
+    return(this.formatPlayRecordTime(this.props.duration, this.state.currentSliderValue / this.state.maxRange));
+  }
   
   render() {
     return (    
@@ -63,7 +68,7 @@ class HistoryControl extends Component {
       value={this.state.currentSliderValue}
       min={0}
       max={this.state.maxRange} />
-      <div className="historyTime">&nbsp;Time:&nbsp;{this.computeCurrentTime()}</div>
+      <div className="historyTime">{ (this.props.duration === undefined ? "Time: --:--:--" : (this.props.mode === 'recording' ? "Record Time: " + this.computeCurrentRecordingTime() : "Play Time: " + this.computeCurrentPlayTime() ) ) }</div>
       </div>
     )
   } 

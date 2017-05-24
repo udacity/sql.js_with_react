@@ -1,14 +1,16 @@
 // TODO:
 //
-// Make CM rewind smarter by jumping right to the right spot rather than rewinding everything.
-// Display recorded time so far
+// Save CM contents to file so we can actually preview the react project
+// React preview window with REACT-ND's sample project, with host:port shown
+// Fork the code. Your version is whole separate panel
 // Recording is additive, but you can start your recording all over again
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
-// Fork this code
 // 
-// React preview window with REACT-ND's sample project
-// Some way to record DevTools and possibly interactions with the student React App
+// Some way to record DevTools and possibly interactions with the student React App: maybe we can do this with bookmarklet
 
+// X If playing and you scrub, stop playing instantly
+// X Display recorded time so far
+// X Make CM rewind smarter by jumping right to the right spot rather than rewinding everything.
 // X Cursor scrubbing
 // X Make sure the CM replay always works right. sometimes it seems to miss selection if you go too fast. Or accelerate it to catch up if needed.
 // X Scrub: calculate steps/ rewindable time scrubber
@@ -83,13 +85,25 @@ class App extends Component {
     this.audioObj = audioObj;
   }
 
+  updateRecordingTimer() {
+    var now = new Date().getTime();
+    var duration = now - this.state.recordingInfo.recordingStartTime;
+    const newState = update(this.state, {
+      recordingInfo: { $merge: {
+        duration: duration
+      }}
+    });
+    this.setState(newState);
+  }
+
   startRecording() {
     var now = new Date().getTime();
     const newState = update(this.state, {
       mode: { $set: 'recording' },
       recordingInfo: { $merge: {
         firstRecordingComplete: true,
-        recordingStartTime: now
+        recordingStartTime: now,
+        timer: setInterval(this.updateRecordingTimer.bind(this), 10)
       }}
     });
     this.setState(newState);
@@ -111,6 +125,7 @@ class App extends Component {
       }}                       
     });
     this.setState(newState);
+    clearInterval(this.state.recordingInfo.timer);
     console.log('Recording stopped, duration:', duration);
   }
 
@@ -161,7 +176,7 @@ class App extends Component {
 
   // Scrub to a particular location
   scrub(value, sliderMaxRange) {
-    //this.stopPlayback();
+    this.stopPlayback();
     var percentagePlayed = this.state.recordingInfo.duration * (value / sliderMaxRange);
     if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
       const newState = update(this.state, {

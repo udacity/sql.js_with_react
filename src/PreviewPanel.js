@@ -14,10 +14,12 @@ class PreviewPanel extends Component {
   render() {
     return  (
       <div className="previewPanel">
-        <div className="hostLabel">Host:{`${this.previewSystem.protocol}:\/\/${this.previewSystem.host}`}:</div>
+        <div className="hostLabel"><span>Host:</span>{`${this.previewSystem.protocol}://${this.previewSystem.host}`}:</div>
         <div className="port"><input type="text" value={`${this.previewSystem.port}`} /></div>
         <div className="contents">
-          <iframe src={`${this.previewSystem.protocol}:\/\/${this.previewSystem.host}:${this.previewSystem.port}`} />
+{
+//      <iframe src={`${this.previewSystem.protocol}://${this.previewSystem.host}:${this.previewSystem.port}`} />
+}
         </div>
       </div>
     );

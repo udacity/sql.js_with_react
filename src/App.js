@@ -1,14 +1,16 @@
 // TODO:
 //
-// Store recording as json into textarea
-// Save CM contents to file so we can actually preview the react project
-// React preview window with REACT-ND's sample project, with host:port shown. Use node proxy ? or maybe just my xterm server to transfer file saves over
+// Store recording as JSON into textarea
+// You can't actually track the cursor over the iframe or into the devtools panel as it no longer gets mousemove. 
+//    Maybe instructors have to include some js that communicates that data back to a tracking server?
 // Fork the code. Your version is whole separate panel
-// Recording is additive, but you can start your recording all over again
+// Recording is additive, but you can start your recording all over again. 
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
-// 
+// Persist the recording somewhere
 // Some way to record DevTools and possibly interactions with the student React App: maybe we can do this with bookmarklet
 
+// X Save CM contents to file so we can actually preview the react project
+// X React preview window with REACT-ND's sample project, with host:port shown. Use node proxy ? or maybe just my xterm server to transfer file saves over
 // X If playing and you scrub, stop playing instantly
 // X Display recorded time so far
 // X Make CM rewind smarter by jumping right to the right spot rather than rewinding everything.
@@ -24,6 +26,7 @@ import React, { Component } from 'react';
 import update from 'react-addons-update';
 import Button from './Button';
 import PreviewPanel from './PreviewPanel';
+import RecordStoragePanel from './RecordStoragePanel';
 import Cursor from './Cursor';
 import RecordAudio from './RecordAudio';
 import HistoryControl from './HistoryControl';
@@ -253,10 +256,16 @@ class App extends Component {
         saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
       />
 
-      <PreviewPanel
-        mode={this.state.mode} 
-        scrubPoint={this.state.playbackInfo.furthestPointReached}
-      />
+      <div className="lowerPanels">
+        <PreviewPanel
+          mode={this.state.mode} 
+          scrubPoint={this.state.playbackInfo.furthestPointReached}
+        />
+        <RecordStoragePanel
+          mode={this.state.mode} 
+        />
+        </div>
+
       </div>
     );
   }

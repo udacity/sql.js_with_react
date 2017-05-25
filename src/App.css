@@ -159,22 +159,31 @@
   font-size:12px;
   position:relative;
   text-align:left;
-  z-index:1000;
   color:#555;
-  top:0px;
-  left:0px;
   padding-left:10px;
 }
 
+.lowerPanels {
+  display:flex;
+  width:100%;
+  margin:2px;
+}
+
 .previewPanel {
-  margin-top:10px;
+  flex-grow:1;
   display:block;
   font-size:12px;
   text-align:left;
+  background-color:#eee;
 }
 
 .previewPanel .hostLabel {
+  margin:2px;
   display:inline;
+}
+
+.previewPanel .hostLabel span {
+  font-weight:800;
 }
 
 .previewPanel .port {
@@ -182,8 +191,22 @@
   width:100%;
 }
 
+.previewPanel .port input {
+  background-color:#eee;
+  width:35px;
+}
+
 .previewPanel .contents iframe {
-  width:100%;
+  width:50%;
   height:500px;
 }
 
+.recordStoragePanel {
+  flex-grow:1;
+}
+
+.recordStoragePanel textarea {
+  width:100%;
+  height:300px;
+  background:#aaa;
+}

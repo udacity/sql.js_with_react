@@ -60,7 +60,7 @@ class HistoryControl extends Component {
   
   render() {
     return (    
-      <div> 
+      <div className="historyControl"> 
       <Range className="scrubber"
       disabled={this.props.disabled}
       onChange={this.handleOnChange.bind(this)}
@@ -68,7 +68,7 @@ class HistoryControl extends Component {
       value={this.state.currentSliderValue}
       min={0}
       max={this.state.maxRange} />
-      <div className="historyTime">{ (this.props.duration === undefined ? "Time: --:--:--" : (this.props.mode === 'recording' ? "Record Time: " + this.computeCurrentRecordingTime() : "Play Time: " + this.computeCurrentPlayTime() ) ) }</div>
+      <div className="timeInfo">{ (this.props.duration === undefined ? "Time: --:--:--" : (this.props.mode === 'recording' ? "Record Time: " + this.computeCurrentRecordingTime() : "Play Time: " + this.computeCurrentPlayTime() ) ) }</div>
       </div>
     )
   } 

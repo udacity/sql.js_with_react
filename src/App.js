@@ -23,6 +23,7 @@
 import React, { Component } from 'react';
 import update from 'react-addons-update';
 import Button from './Button';
+import PreviewPanel from './PreviewPanel';
 import Cursor from './Cursor';
 import RecordAudio from './RecordAudio';
 import HistoryControl from './HistoryControl';
@@ -210,20 +211,6 @@ class App extends Component {
 
       <Cursor id="cursor" mode={this.state.mode} scrubPoint={this.state.playbackInfo.furthestPointReached}/>
 
-      <Button 
-        disabled={this.state.mode === 'playback' } 
-        click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
-        label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
-        title={`Make Recording`}
-      />
-      
-      <Button 
-      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-      click={() => this.startStopPlayback()  } 
-        label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
-        title={`Play/Stop`}
-      />
-
       <SimplerCodeMirror 
         mode={this.state.mode} 
         scrubPoint={this.state.playbackInfo.furthestPointReached}
@@ -235,20 +222,41 @@ class App extends Component {
         scrubPoint={this.state.playbackInfo.furthestPointReached}
       />
 
-      <HistoryControl 
-        mode={this.state.mode} 
-        scrub={this.scrub}
-        disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-        duration={this.state.recordingInfo.duration} 
-        updateSlider={this.updateSlider} 
-        newSliderValue={this.state.sliderValue} 
-      />
+      <div className="recordPlayControls">
+        <div className="controlBtns">
+        <Button 
+          disabled={this.state.mode === 'playback' } 
+          click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
+          label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
+          title={`Make Recording`}
+        />
+      
+        <Button 
+          disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
+          click={() => this.startStopPlayback()  } 
+          label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
+          title={`Play/Stop`}
+        />
+        </div>
+        <HistoryControl 
+          mode={this.state.mode} 
+          scrub={this.scrub}
+          disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
+          duration={this.state.recordingInfo.duration} 
+          updateSlider={this.updateSlider} 
+          newSliderValue={this.state.sliderValue} 
+        />
+      </div>
 
       <RecordAudio 
         mode={this.state.mode} 
         saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
       />
 
+      <PreviewPanel
+        mode={this.state.mode} 
+        scrubPoint={this.state.playbackInfo.furthestPointReached}
+      />
       </div>
     );
   }

@@ -134,11 +134,11 @@ class SimplerCodeMirror extends Component {
     var record = historyItem.record;
     console.log('runChange: Playing back change');
     //this.cm.doc.replaceRange(record.text, record.from,record.to, 'playback');
-    var currentScroll = this.cm.getScrollInfo();
-    var cursorInfo = this.cm.getCursor();
+    //var currentScroll = this.cm.getScrollInfo();
+    //var cursorInfo = this.cm.getCursor();
     this.cm.setValue(record.contents);
-    this.cm.scrollTo(currentScroll.left, currentScroll.top);
-    this.cm.setCursor(cursorInfo);
+    this.cm.scrollTo(record.scrollInfo.left, record.scrollInfo.top);
+    this.cm.setCursor(record.cursorInfo);
   }
 
   playHistory = () => {
@@ -272,7 +272,9 @@ class SimplerCodeMirror extends Component {
         type: 'change',
         record: {
           contents: this.cm.getValue(),
-          origin: 'playback'
+          origin: 'playback',
+          scrollInfo: this.cm.getScrollInfo(),
+          cursorInfo: this.cm.getCursor()
         }
       }
       this.recordAction(cm,cmAction);

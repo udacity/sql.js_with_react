@@ -16,8 +16,19 @@ class SimplerCodeMirror extends Component {
     this.postScrubAction = undefined;
   }
 
+  getXtermHost() {
+    const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+    const xtermHost = 'localhost';
+    const xtermPort = 3001;
+    return {
+      protocol,
+      httpHost:   `${location.protocol}//${xtermHost}:${xtermPort}`,
+      socketUrl : `${protocol}${xtermHost}:${xtermPort}/terminals/`,
+    }
+  }
+
   componentDidMount() {
-    fetch(`/addons/fit/fit.js`)
+    fetch(`/ListBooks.js`)
       .then(response => response.text() )
       .then(data => {
         var textAreaNode = this.findDOMNode(this.refs.textarea);
@@ -235,6 +246,22 @@ class SimplerCodeMirror extends Component {
   
   handleChange = (cm,action) => {
     console.log('Change:',action);
+    var host = this.getXtermHost();
+    var url = `${host.httpHost}/terminal/persist`;
+    var contents = this.cm.getValue();
+    var persister = JSON.stringify({
+      fileName: 'ListBooks.js',
+      fileData: contents, 
+      destination:'/Users/will/Documents/Development/nd-react/two/myreads/src'
+    });
+    fetch(url, {
+      method: 'POST', 
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body:persister
+    });
     if (action.origin === 'playback') {
       console.log('Ignoring this change since it came from a recorded playback.');
     } else if (action.origin === 'setValue') {

@@ -116,8 +116,7 @@
 }
 
 #terminal-container {
-  /*width: 90%;*/
-  height: 150px;
+  height: 125px;
   margin: 2px;
   padding: 2px;
   font-size:14px;

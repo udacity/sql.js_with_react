@@ -1,14 +1,15 @@
 // TODO:
 //
-// Store recording as JSON into textarea
+// Restore the audio from the base64 data
+// Persist the recording somewhere
 // You can't actually track the cursor over the iframe or into the devtools panel as it no longer gets mousemove. 
 //    Maybe instructors have to include some js that communicates that data back to a tracking server?
 // Fork the code. Your version is whole separate panel
 // Recording is additive, but you can start your recording all over again. 
 // Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
-// Persist the recording somewhere
 // Some way to record DevTools and possibly interactions with the student React App: maybe we can do this with bookmarklet
 
+// X Store recording as JSON into textarea
 // X Save CM contents to file so we can actually preview the react project
 // X React preview window with REACT-ND's sample project, with host:port shown. Use node proxy ? or maybe just my xterm server to transfer file saves over
 // X If playing and you scrub, stop playing instantly
@@ -105,6 +106,14 @@ class App extends Component {
     var now = new Date().getTime();
     const newState = update(this.state, {
       mode: { $set: 'recording' },
+      recordedParts: { 
+        $set: {
+          cursorHistory: {},
+          editorHistory: {},
+          audioHistory:  {},
+          xtermHistory:  {}
+        }
+      },
       recordingInfo: { $merge: {
         firstRecordingComplete: true,
         recordingStartTime: now,
@@ -112,12 +121,6 @@ class App extends Component {
       }}
     });
     this.setState(newState);
-    this.recordedParts = {
-      cursorHistory: {},
-      editorHistory: {},
-      audioHistory:  {},
-      xtermHistory:  {}
-    }
 
     console.log('Recording started.');
   }
@@ -167,8 +170,13 @@ class App extends Component {
 
   storeRecordedPart(whichPart, data) {
     console.log('storeRecordedPart:', whichPart);
-    this.recordedParts[whichPart] = data[whichPart];
-    console.log('now this.recordedParts:', this.recordedParts);
+    console.log('now this.state.recordedParts:', this.state.recordedParts);
+
+    this.setState((prevState) => ({
+      recordedParts: Object.assign({}, prevState.recordedParts, {
+        [whichPart]: data[whichPart]
+      })
+    }));
   }
   
   updatePlaybackTimer = () => {
@@ -282,7 +290,7 @@ class App extends Component {
       />
       <RecordStoragePanel
         mode={this.state.mode} 
-        recordedParts={this.recordedParts}
+        recordedParts={this.state.recordedParts}
       />
       </div>
 

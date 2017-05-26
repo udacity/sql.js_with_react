@@ -51,7 +51,7 @@ class RecordAudio extends Component {
       // For going backwards, use https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript and note comment about ie10
       let base64String = btoa([].reduce.call(new Uint8Array(bufferArray),function(p,c){return p+String.fromCharCode(c)},''));
       console.log(base64String);
-      this.props.storeRecordedPart('audioHistory', { audioHistory: { thing: base64String } });
+      this.props.storeRecordedPart('audioHistory', { audioHistory: { base64data: base64String } });
     }.bind(this));
     reader.readAsArrayBuffer(e.data);
 

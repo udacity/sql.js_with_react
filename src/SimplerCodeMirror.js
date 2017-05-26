@@ -143,7 +143,7 @@ class SimplerCodeMirror extends Component {
   }
 
   playHistory = () => {
-    console.log('playHistory: lastPlayMarker=', this.lastPlayMarker);
+    //console.log('playHistory: lastPlayMarker=', this.lastPlayMarker);
     var nextAction = this.history[this.lastPlayMarker];
     var now = new Date().getTime();
     var timeDiff = (now - this.replayStartTime) + this.furthestPointReached;
@@ -153,7 +153,7 @@ class SimplerCodeMirror extends Component {
       this.lastPlayMarker++;
       switch(historyItem.type) {
         case 'change':
-          console.log('change history during playback:',historyItem);
+          //console.log('change history during playback:',historyItem);
           this.runChange(historyItem);
           break;
         case 'cursorActivity':

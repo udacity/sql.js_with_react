@@ -269,13 +269,17 @@ class SimplerCodeMirror extends Component {
     } else if (action.origin === 'setValue') {
       console.log('Ignoring this change since it came from a recorded playback (setValue).');
     } else {
+      var scrollInfo = this.cm.getScrollInfo();
+      var cleanedScrollInfo = { top: scrollInfo.top, left: scrollInfo.left };
+      var cursorInfo = this.cm.getCursor();
+      var cleanedCursorInfo = { line: cursorInfo.line, ch: cursorInfo.ch };
       var cmAction = {
         type: 'change',
         record: {
           contents: this.cm.getValue(),
           origin: 'playback',
-          scrollInfo: this.cm.getScrollInfo(),
-          cursorInfo: this.cm.getCursor()
+          scrollInfo: cleanedScrollInfo,
+          cursorInfo: cleanedCursorInfo
         }
       }
       this.recordAction(cm,cmAction);
@@ -298,7 +302,9 @@ class SimplerCodeMirror extends Component {
       var selectionLength = Math.abs(minMaxCh[1] - minMaxCh[0]);
       //console.log('selectionLength:', selectionLength);
       if (selectionLength === 0) {
-        this.recordAction(cm, { type: 'cursorActivity', record: { position: cm.getCursor() }});;
+        var cursorInfo = this.cm.getCursor();
+        var cleanedCursorInfo = { line: cursorInfo.line, ch: cursorInfo.ch };
+        this.recordAction(cm, { type: 'cursorActivity', record: { position: cleanedCursorInfo }});;
       } else {
         this.recordAction(cm, { type: 'selection', record: { line: minMaxLine, ch: minMaxCh }});;
         //console.log('Selected:', minMaxLine[0], ':', minMaxCh[0], 'to', minMaxLine[1], ':', minMaxCh[1]);
@@ -308,8 +314,9 @@ class SimplerCodeMirror extends Component {
   
   handleScroll = (cm,action) => {
     console.log('scrolled',action);
-    var scrollRecord = cm.getScrollInfo();
-    this.recordAction(cm, { type: 'scroll', record: scrollRecord });;
+    var scrollInfo = cm.getScrollInfo();
+    var cleanedScrollInfo = { top: scrollInfo.top, left: scrollInfo.left };
+    this.recordAction(cm, { type: 'scroll', record: cleanedScrollInfo });;
   }
 
   render() {

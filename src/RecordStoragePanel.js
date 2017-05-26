@@ -2,26 +2,10 @@ import React, { Component } from 'react';
 
 class RecordStoragePanel extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      recordedJson: {
-        recordings: [
-          {
-            cursor: {},
-            editor: {},
-            xterm:  {},
-            audio:  {},
-          }
-        ]
-      }
-    }
-  }
-
   render() {
     return  (
       <div className="recordStoragePanel">
-        <textarea>{JSON.stringify(this.state.recordedJson, null, 2)}</textarea>
+        <textarea value={JSON.stringify(this.props.recordedParts, null, 2)} />
       </div>
     );
   } 

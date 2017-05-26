@@ -104,6 +104,7 @@ class SimplerCodeMirror extends Component {
   stopRecording() {
     //var history = this.cm.getHistory();
     console.log('Stopped Cm recording, history:', this.history);
+    this.props.storeRecordedPart('editorHistory', { editorHistory: this.history });
     // Remove the first load up steps from the history so we can't undo too far
     this.lastPlayMarker = this.history.length - 1;
     this.justStoppedRecording = true;

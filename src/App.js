@@ -47,7 +47,7 @@ class App extends Component {
       recordingInfo: {},
       playbackInfo: {},
       sliderValue: 0,
-      cmOptions: { historyEventDelay: 50 }
+      cmOptions: { historyEventDelay: 50 },
     };
 
     this.scrub = this.scrub.bind(this);
@@ -112,6 +112,12 @@ class App extends Component {
       }}
     });
     this.setState(newState);
+    this.recordedParts = {
+      cursorHistory: {},
+      editorHistory: {},
+      audioHistory:  {},
+      xtermHistory:  {}
+    }
 
     console.log('Recording started.');
   }
@@ -159,6 +165,11 @@ class App extends Component {
     this.audioObj.play();
   }
 
+  storeRecordedPart(whichPart, data) {
+    console.log('storeRecordedPart:', whichPart);
+    this.recordedParts[whichPart] = data[whichPart];
+  }
+  
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
@@ -212,59 +223,67 @@ class App extends Component {
        this.props.useHeader !== "0" ? <div className="App-header"><img src={logo} className="App-logo" alt="logo" /><h3>Session Recording Demo</h3></div> : null
       }
 
-      <Cursor id="cursor" mode={this.state.mode} scrubPoint={this.state.playbackInfo.furthestPointReached}/>
+      <Cursor id="cursor" 
+         mode={this.state.mode} 
+         scrubPoint={this.state.playbackInfo.furthestPointReached} 
+         storeRecordedPart={this.storeRecordedPart.bind(this)}
+      />
 
       <SimplerCodeMirror 
         mode={this.state.mode} 
         scrubPoint={this.state.playbackInfo.furthestPointReached}
         options={this.state.cmOptions}
+        storeRecordedPart={this.storeRecordedPart.bind(this)}      
       />
 
       <Xterm 
         mode={this.state.mode} 
         scrubPoint={this.state.playbackInfo.furthestPointReached}
+      storeRecordedPart={this.storeRecordedPart.bind(this)}      
       />
 
       <div className="recordPlayControls">
-        <div className="controlBtns">
-        <Button 
-          disabled={this.state.mode === 'playback' } 
-          click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
-          label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
-          title={`Make Recording`}
-        />
+      <div className="controlBtns">
+      <Button 
+      disabled={this.state.mode === 'playback' } 
+      click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
+      label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
+      title={`Make Recording`}
+      />
       
-        <Button 
-          disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-          click={() => this.startStopPlayback()  } 
-          label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
-          title={`Play/Stop`}
-        />
-        </div>
-        <HistoryControl 
-          mode={this.state.mode} 
-          scrub={this.scrub}
-          disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-          duration={this.state.recordingInfo.duration} 
-          updateSlider={this.updateSlider} 
-          newSliderValue={this.state.sliderValue} 
-        />
+      <Button 
+      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
+      click={() => this.startStopPlayback()  } 
+      label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
+      title={`Play/Stop`}
+      />
+      </div>
+      <HistoryControl 
+      mode={this.state.mode} 
+      scrub={this.scrub}
+      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
+      duration={this.state.recordingInfo.duration} 
+      updateSlider={this.updateSlider} 
+      newSliderValue={this.state.sliderValue} 
+      />
       </div>
 
       <RecordAudio 
-        mode={this.state.mode} 
-        saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
+      mode={this.state.mode} 
+      saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
+      storeRecordedPart={this.storeRecordedPart.bind(this)}      
       />
 
       <div className="lowerPanels">
-        <PreviewPanel
-          mode={this.state.mode} 
-          scrubPoint={this.state.playbackInfo.furthestPointReached}
-        />
-        <RecordStoragePanel
-          mode={this.state.mode} 
-        />
-        </div>
+      <PreviewPanel
+      mode={this.state.mode} 
+        scrubPoint={this.state.playbackInfo.furthestPointReached}
+      />
+      <RecordStoragePanel
+        mode={this.state.mode} 
+        recordedParts={this.recordedParts}
+      />
+      </div>
 
       </div>
     );

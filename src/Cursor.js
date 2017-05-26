@@ -71,6 +71,7 @@ class Cursor extends Component {
   stopRecording() {
     clearInterval(this.recordInterval);
     console.log('Stopped cursor playback, array size:', this.cursorMotion.length, 'contents of the array:', this.cursorMotion);
+    this.props.storeRecordedPart('cursorHistory', { cursorHistory: this.cursorMotion });
   }
 
   recordCursorMotion = (e) => {

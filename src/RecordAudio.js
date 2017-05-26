@@ -52,6 +52,7 @@ class RecordAudio extends Component {
     // http://stackoverflow.com/questions/9563887/setting-html5-audio-position
 
     this.saveAudioForPlayback(audioObj);
+    this.props.storeRecordedPart('audio', { audio: audioObj });
   }
 
   

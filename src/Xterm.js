@@ -157,6 +157,7 @@ class Xterm extends Component {
     console.log('xterm stopped recording');
     this.resetOnNextPlay = true;
     this.historyIndex = 0;
+    this.props.storeRecordedPart('xtermHistory', { xtermHistory: this.history });
   }
 
   writeHistoryRecordToXterm(historyItem, ignoreScrolling) {

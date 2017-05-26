@@ -44,6 +44,7 @@
   border: 1px solid black;
   margin: 5px;
   height:100px !important;
+  color:#999 !important;
 }
 
 .Banner {
@@ -82,7 +83,7 @@
   z-index:1000;
   color:#fd5;
   text-shadow:3px 2px #000;
-  top: 0;
+  top: -100px;
   left: 0;
 }
 
@@ -124,8 +125,8 @@
 }
 
 #terminal-container .terminal {
-  background-color: #555;
-  color: #fafafa;
+  background-color: #002b36 !important;
+  color: #7C9CB2;
   padding: 2px;
 }
 

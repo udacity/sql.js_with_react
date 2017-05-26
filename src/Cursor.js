@@ -5,7 +5,7 @@ class Cursor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      position: { x : 0, y : 0 },
+      position: { x : 0, y : -100 },
     }
     this.recordInterval = undefined;
     this.cursorMotion = undefined;

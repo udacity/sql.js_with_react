@@ -1,12 +1,13 @@
 // TODO:
 //
+// Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
+// Fork the moment you try to make a change: prompt the user, "do you want to fork?"
+// Fork the code. Your version is whole separate panel
 // Restore the audio from the base64 data
 // Persist the recording somewhere
 // You can't actually track the cursor over the iframe or into the devtools panel as it no longer gets mousemove. 
 //    Maybe instructors have to include some js that communicates that data back to a tracking server?
-// Fork the code. Your version is whole separate panel
 // Recording is additive, but you can start your recording all over again. 
-// Tab panels https://github.com/reactjs/react-tabs/blob/master/README.md
 // Some way to record DevTools and possibly interactions with the student React App: maybe we can do this with bookmarklet
 
 // X Store recording as JSON into textarea
@@ -35,6 +36,7 @@ import SimplerCodeMirror from './SimplerCodeMirror';
 import Xterm from './Xterm';
 import logo from './udacity_logo.png';
 import './App.css';
+import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
 
 

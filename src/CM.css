@@ -1,0 +1,174 @@
+.editor {
+  height: calc(100% - 36px) !important;
+}
+
+.editor-navbar {
+  display: none;
+}
+
+.editor-container {
+  border: none;
+}
+.editor-container .navbar {
+  position: absolute;
+  bottom: 0;
+  z-index: 2;
+  width: 100%;
+}
+
+.overflow-tab {
+  background-color: #1c262f;
+  height: 39px;
+  width: 21px;
+}
+.overflow-tab:before {
+  line-height: 40px;
+  color: white;
+}
+
+.overflow-dropdown {
+  border-radius: 4px;
+  top: 39px;
+  padding: 3px 0;
+  color: #2e3d49;
+}
+.overflow-dropdown li.active, .overflow-dropdown li:hover {
+  background-color: #02ccba;
+}
+
+.CodeMirror {
+  webkit-box-shadow: none;
+  box-shadow: none !important;
+  background-color: #002b36 !important;
+  font-family: 'Monaco', monospace;
+  font-size: .9em;
+  color: #7C9CB2;
+}
+
+.CodeMirror-cursor {
+  border-left-color: white;
+}
+
+.CodeMirror-gutters {
+  background-color: #002b36 !important;
+  border: none;
+}
+
+.CodeMirror-wrap pre {
+  padding-left: 10px;
+}
+
+.cm-header {
+  color: #586e75 !important;
+}
+
+.cm-quote {
+  color: #93a1a1 !important;
+}
+
+.cm-keyword {
+  color: #FF8E00 !important;
+}
+
+.cm-atom, .cm-number {
+  color: #02CCBA !important;
+}
+
+.cm-def {
+  color: #02B3E4 !important;
+}
+
+.cm-variable {
+  color: #7C9CB2 !important;
+}
+
+.cm-variable-2 {
+  color: #ECC81A !important;
+}
+
+.cm-variable-3 {
+  color: #BC86F9 !important;
+}
+
+.cm-property {
+  color: #02B3E4 !important;
+}
+
+.cm-operator {
+  color: #BC86F9 !important;
+}
+
+.cm-comment {
+  color: #586e75 !important;
+  font-style: italic;
+}
+
+.cm-string {
+  color: #15C26B !important;
+}
+
+.cm-string-2 {
+  color: #ECC81A !important;
+}
+
+.cm-meta {
+  color: #15C26B !important;
+}
+
+.cm-qualifier {
+  color: #ECC81A !important;
+}
+
+.cm-builtin {
+  color: #02CCBA !important;
+}
+
+.cm-bracket {
+  color: #FF8E00 !important;
+}
+
+.CodeMirror-matchingbracket {
+  color: #15C26B !important;
+}
+
+.CodeMirror-nonmatchingbracket {
+  color: #dc322f !important;
+}
+
+.cm-tag {
+  color: #93a1a1 !important;
+}
+
+.cm-attribute {
+  color: #02B3E4 !important;
+}
+
+.cm-hr {
+  color: transparent;
+  border-top: 1px solid #586e75;
+  display: block;
+}
+
+.cm-link {
+  color: #93a1a1;
+  cursor: pointer;
+}
+
+.cm-special {
+  color: #BC86F9;
+}
+
+.cm-em {
+  color: #999;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.cm-strong {
+  color: #eee;
+}
+
+.cm-error, .cm-invalidchar {
+  color: #586e75;
+  border-bottom: 1px dotted #dc322f;
+}

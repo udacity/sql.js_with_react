@@ -18,7 +18,9 @@ class PreviewPanel extends Component {
         <div className="port"><input type="text" value={`${this.previewSystem.port}`} /></div>
         <div className="contents">
 
-        <iframe src={`${this.previewSystem.protocol}://${this.previewSystem.host}:${this.previewSystem.port}`} />
+{
+//        <iframe src={`${this.previewSystem.protocol}://${this.previewSystem.host}:${this.previewSystem.port}`} />
+}
         </div>
       </div>
     );

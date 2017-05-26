@@ -1,74 +1,37 @@
 .App {
   text-align: center;
+  display:flex;
+  flex-direction:column;
+  height:100%;
 }
 
-.App-logo {
-  /*animation: App-logo-spin infinite 20s linear;*/
-  height: 40px;
-}
-
-.App-header {
-  background-color: #222;
-  padding: 10px;
-  color: white;
-  height:15px;
-  display:none;
-}
-
-.App-intro {
-  font-size: 14px;
-}
-
-.App table { 
-  border-collapse: collapse; 
+.topPanels {
   width:100%;
+  display:flex;
+  flex-grow:1;
 }
 
-.App table, .App th, .App td {
-  border: 1px solid black; 
-  text-align:left; 
-  font-family:Arial,Helvetica
+.topLeftPanels {
+  display:flex;
+  flex-grow:1;
+  flex-direction:column;
 }
 
-.App th { 
-  color:white;
-  background-color:#55f;
+.topLeftPanels > div {
+  flex-grow:1;
 }
 
-.App th, .App td { 
-  padding:4px; 
+.topRightPanels {
+  flex-grow:1;
 }
 
 .CodeMirror {
   text-align: left;
-  border: 1px solid black;
-  margin: 5px;
-  height:100px !important;
+  font-size:1.1em !important;
   color:#999 !important;
+  height:300px !important;
 }
 
-.Banner {
-  width:100%;
-  text-align:left;
-  font-style:italic;
-  font-size:14px;
-  margin:2px;
-}
-
-.SqlOutput {
-  margin:5px 4px 4px 4px;
-}
-
-.SqlLoadStatus {
-  font-size:10px;
-  text-align:left;
-  color:#fff;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 #canvas {
   position:absolute;
@@ -117,11 +80,10 @@
 }
 
 #terminal-container {
-  height: 125px;
-  margin: 2px;
-  padding: 2px;
+  flex-grow:1;
   font-size:14px;
   line-height:15px;
+  height:150px;
 }
 
 #terminal-container .terminal {
@@ -130,9 +92,17 @@
   padding: 2px;
 }
 
+.bottomPanels {
+  display:flex;
+  flex-grow:1;
+  width:100%;
+}
+
 .recordPlayControls {
   display:flex;
+  flex-grow:1;
   flex-direction:row;
+  height:20px;
 }
 
 .historyControl {
@@ -164,11 +134,6 @@
   padding-left:10px;
 }
 
-.lowerPanels {
-  display:flex;
-  width:100%;
-  margin:2px;
-}
 
 .previewPanel {
   flex-grow:1;
@@ -199,16 +164,18 @@
 
 .previewPanel .contents iframe {
   width:100%;
-  height:500px;
+  height:400px;
 }
 
 .recordStoragePanel {
-  flex-grow:1;
+  flex-grow:0.25;
 }
 
 .recordStoragePanel textarea {
+  flex-grow:1;
   width:100%;
   height:300px;
   background:#aaa;
   display:none;
+  border:1px solid #eee;
 }

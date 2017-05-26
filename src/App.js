@@ -50,7 +50,7 @@ class App extends Component {
       recordingInfo: {},
       playbackInfo: {},
       sliderValue: 0,
-      cmOptions: { historyEventDelay: 50 },
+      cmOptions: { historyEventDelay: 50, lineNumbers:true },
     };
 
     this.scrub = this.scrub.bind(this);
@@ -230,28 +230,37 @@ class App extends Component {
     //console.log(this.state.userQuery);
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
-      {
-       this.props.useHeader !== "0" ? <div className="App-header"><img src={logo} className="App-logo" alt="logo" /><h3>Session Recording Demo</h3></div> : null
-      }
 
-      <Cursor id="cursor" 
-         mode={this.state.mode} 
-         scrubPoint={this.state.playbackInfo.furthestPointReached} 
-         storeRecordedPart={this.storeRecordedPart.bind(this)}
-      />
+      <div className="topPanels">
+        <div className="topLeftPanels">
+          <SimplerCodeMirror 
+            mode={this.state.mode} 
+            scrubPoint={this.state.playbackInfo.furthestPointReached}
+            options={this.state.cmOptions}
+            storeRecordedPart={this.storeRecordedPart.bind(this)}      
+          />
+  
+          <Xterm 
+            mode={this.state.mode} 
+            scrubPoint={this.state.playbackInfo.furthestPointReached}
+            storeRecordedPart={this.storeRecordedPart.bind(this)}      
+          />
+        </div>
+        <div className="topRightPanels">
+         <PreviewPanel
+           mode={this.state.mode} 
+           scrubPoint={this.state.playbackInfo.furthestPointReached}
+         />
+        </div>
+        <Cursor id="cursor" 
+          mode={this.state.mode} 
+          scrubPoint={this.state.playbackInfo.furthestPointReached} 
+          storeRecordedPart={this.storeRecordedPart.bind(this)}
+        />
+      </div>
 
-      <SimplerCodeMirror 
-        mode={this.state.mode} 
-        scrubPoint={this.state.playbackInfo.furthestPointReached}
-        options={this.state.cmOptions}
-        storeRecordedPart={this.storeRecordedPart.bind(this)}      
-      />
 
-      <Xterm 
-        mode={this.state.mode} 
-        scrubPoint={this.state.playbackInfo.furthestPointReached}
-      storeRecordedPart={this.storeRecordedPart.bind(this)}      
-      />
+      <div className="bottomPanels">
 
       <div className="recordPlayControls">
       <div className="controlBtns">
@@ -269,6 +278,7 @@ class App extends Component {
       title={`Play/Stop`}
       />
       </div>
+
       <HistoryControl 
       mode={this.state.mode} 
       scrub={this.scrub}
@@ -285,11 +295,6 @@ class App extends Component {
       storeRecordedPart={this.storeRecordedPart.bind(this)}      
       />
 
-      <div className="lowerPanels">
-      <PreviewPanel
-      mode={this.state.mode} 
-        scrubPoint={this.state.playbackInfo.furthestPointReached}
-      />
       <RecordStoragePanel
         mode={this.state.mode} 
         recordedParts={this.state.recordedParts}

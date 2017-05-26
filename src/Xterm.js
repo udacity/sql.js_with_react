@@ -240,9 +240,7 @@ class Xterm extends Component {
   
   render() {
     return  (
-      <div>
-        <div id="terminal-container"></div>
-      </div>
+      <div id="terminal-container"></div>
     );
   } 
 }

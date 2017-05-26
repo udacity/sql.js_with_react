@@ -42,6 +42,18 @@ class RecordAudio extends Component {
   saveRecordedAudio(e) {
     //console.log("Audio data available");
 
+    console.log('audio data:', e.data);
+    var reader = new FileReader();
+    reader.addEventListener("loadend", function() {
+      // reader.result contains the contents of blob as a typed array
+      var bufferArray = reader.result;
+      // From: https://stackoverflow.com/questions/9267899/arraybuffer-to-base64-encoded-string
+      let base64String = btoa([].reduce.call(new Uint8Array(bufferArray),function(p,c){return p+String.fromCharCode(c)},''));
+      console.log(base64String);
+      this.props.storeRecordedPart('audioHistory', { audioHistory: { thing: base64String } });
+    }.bind(this));
+    reader.readAsArrayBuffer(e.data);
+
     var audioUrl = window.URL.createObjectURL(e.data);
     // This works so nice and simple. From: http://stackoverflow.com/questions/33755524/how-to-load-audio-completely-before-playing (first answer)
     var audioObj = new Audio (audioUrl);
@@ -52,7 +64,6 @@ class RecordAudio extends Component {
     // http://stackoverflow.com/questions/9563887/setting-html5-audio-position
 
     this.saveAudioForPlayback(audioObj);
-    this.props.storeRecordedPart('audio', { audio: audioObj });
   }
 
   

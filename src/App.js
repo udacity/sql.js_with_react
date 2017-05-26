@@ -168,6 +168,7 @@ class App extends Component {
   storeRecordedPart(whichPart, data) {
     console.log('storeRecordedPart:', whichPart);
     this.recordedParts[whichPart] = data[whichPart];
+    console.log('now this.recordedParts:', this.recordedParts);
   }
   
   updatePlaybackTimer = () => {

@@ -26,6 +26,8 @@
 
 import React, { Component } from 'react';
 import update from 'react-addons-update';
+import Tabs from 'react-simpletabs';
+import '../node_modules/react-simpletabs/lib/react-simpletabs.css';
 import Button from './Button';
 import PreviewPanel from './PreviewPanel';
 import RecordStoragePanel from './RecordStoragePanel';
@@ -34,7 +36,6 @@ import RecordAudio from './RecordAudio';
 import HistoryControl from './HistoryControl';
 import SimplerCodeMirror from './SimplerCodeMirror';
 import Xterm from './Xterm';
-import logo from './udacity_logo.png';
 import './App.css';
 import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
@@ -231,10 +232,13 @@ class App extends Component {
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
 
+      <Tabs>
+      <Tabs.Panel title='Instruction'>
+
       <div className="topPanels">
-        <div className="topLeftPanels">
-          <SimplerCodeMirror 
-            mode={this.state.mode} 
+      <div className="topLeftPanels">
+      <SimplerCodeMirror 
+      mode={this.state.mode} 
             scrubPoint={this.state.playbackInfo.furthestPointReached}
             options={this.state.cmOptions}
             storeRecordedPart={this.storeRecordedPart.bind(this)}      
@@ -300,6 +304,16 @@ class App extends Component {
         recordedParts={this.state.recordedParts}
       />
       </div>
+
+      </Tabs.Panel>
+
+      <Tabs.Panel title='Fork #1'>
+      <h2>Content #2 here</h2>
+      </Tabs.Panel>
+      <Tabs.Panel title='Fork #2'>
+      <h2>Content #3 here</h2>
+      </Tabs.Panel>
+      </Tabs>
 
       </div>
     );

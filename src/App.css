@@ -179,3 +179,7 @@
   display:none;
   border:1px solid #eee;
 }
+
+.tab-panel {
+  padding:0px !important;
+}

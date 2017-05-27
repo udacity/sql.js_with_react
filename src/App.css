@@ -32,6 +32,9 @@
   height:300px !important;
 }
 
+.CodeMirror-cursor {
+  border-left:1.25px solid yellow !important;
+}
 
 #canvas {
   position:absolute;

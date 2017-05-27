@@ -308,10 +308,10 @@ class App extends Component {
       </Tabs.Panel>
 
       <Tabs.Panel title='Fork #1'>
-      <h2>Content #2 here</h2>
+      <h2>Fork #1 here</h2>
       </Tabs.Panel>
       <Tabs.Panel title='Fork #2'>
-      <h2>Content #3 here</h2>
+      <h2>Fork #2 here</h2>
       </Tabs.Panel>
       </Tabs>
 

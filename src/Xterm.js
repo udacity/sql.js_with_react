@@ -30,6 +30,10 @@ class Xterm extends Component {
     this.constructTerminal();
   }
 
+  componentWillUnmount() {
+    console.log('unmounted xterm');
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (this.props.mode !== nextProps.mode) {
       switch (nextProps.mode) {

@@ -186,3 +186,7 @@
 .tab-panel {
   padding:0px !important;
 }
+
+.recordStoragePanel li {
+  text-align:left !important;
+}

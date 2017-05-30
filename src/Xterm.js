@@ -6,6 +6,9 @@ import React, { Component } from 'react';
 //require('../public/addons/attach/attach');
 //require('../public/addons/fit/fit');
 
+// Serious hack to avoid setting up redux for now
+let previousXtermHistory = undefined;
+
 class Xterm extends Component {
   constructor(props) {
     super(props);
@@ -13,6 +16,7 @@ class Xterm extends Component {
     this.replayStartTime = undefined;
     this.resetOnNextPlay = false;
     this.furthestPointReached = 0;
+    this.historyIndex = 0;
   }
 
   getXtermHost() {
@@ -27,11 +31,19 @@ class Xterm extends Component {
   }
 
   componentDidMount() {
+    console.log('Xterm just mounted.');
     this.constructTerminal();
+    if (previousXtermHistory) {
+      this.history = previousXtermHistory.slice();
+      console.log('Restored xterm history at mount.');
+    }
   }
 
   componentWillUnmount() {
-    console.log('unmounted xterm');
+    if (this.history && this.history.length > 0) {
+      previousXtermHistory = this.history.slice();
+      console.log('Saved Xterm history at unmount.');
+    }
   }
   
   componentWillReceiveProps(nextProps) {
@@ -98,16 +110,18 @@ class Xterm extends Component {
 
     this.term.viewport.viewportElement.addEventListener('scroll', (e) => {
       //console.log('scroll:', e);
-      var target = e.target;
-      var scrollTop = target.scrollTop;
-      //console.log('scrollTop:', scrollTop);
-      var now = new Date().getTime();
-      var dataRecord = {
-        type: 'scroll',
-        data: scrollTop,
-        timeOffset: now - this.recordingStartTime
+      if (this.props.mode === 'recording') {
+        var target = e.target;
+        var scrollTop = target.scrollTop;
+        //console.log('scrollTop:', scrollTop);
+        var now = new Date().getTime();
+        var dataRecord = {
+          type: 'scroll',
+          data: scrollTop,
+          timeOffset: now - this.recordingStartTime
+        }
+        this.history.push(dataRecord);
       }
-      this.history.push(dataRecord);
     });
 
     var initialGeometry = this.term.proposeGeometry();

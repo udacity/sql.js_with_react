@@ -15,10 +15,12 @@ class PreviewPanel extends Component {
     return  (
       <div className="previewPanel">
         <div className="hostLabel"><span>Host:</span>{`${this.previewSystem.protocol}://${this.previewSystem.host}`}:</div>
-        <div className="port"><input type="text" value={`${this.previewSystem.port}`} /></div>
+        <div className="port"><input type="text" defaultValue={`${this.previewSystem.port}`} /></div>
         <div className="contents">
+{
+//        <iframe src={`${this.previewSystem.protocol}://${this.previewSystem.host}:${this.previewSystem.port}`} />
+}
 
-        <iframe src={`${this.previewSystem.protocol}://${this.previewSystem.host}:${this.previewSystem.port}`} />
         </div>
       </div>
     );

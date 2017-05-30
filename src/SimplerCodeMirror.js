@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../node_modules/codemirror/mode/javascript/javascript';
 
+// Serious hack to avoid setting up redux for now
+let previousCmHistory = undefined;
+
 class SimplerCodeMirror extends Component {
 
   constructor(props) {
@@ -41,6 +44,14 @@ class SimplerCodeMirror extends Component {
         history.done.shift();
         this.cm.setHistory(history);
 
+        if (previousCmHistory) {
+          this.history = previousCmHistory.history.slice();
+          this.initialCmContents = data,
+          this.initialCursorPos  = this.cm.getCursor();
+          this.rewindToBeginning();
+          console.log('Restored previously recorded history.');
+        }
+
         this.cm.on('change', this.handleChange);
         this.cm.on('cursorActivity', this.handleCursorActivity);
         this.cm.on('scroll', this.handleScroll);
@@ -77,6 +88,15 @@ class SimplerCodeMirror extends Component {
     } else if ((this.props.mode === 'scrub') && (nextProps.scrubPoint !== this.scrubPoint)) {
       this.scrub(nextProps.scrubPoint);
     }
+  }
+
+  componentWillUnmount() {
+    previousCmHistory = { 
+      history: this.history.slice(),
+      initialCmContents: this.initialCmContents,
+      initialCursorPos:  this.initialCursorPos,
+    }
+    console.log('Saved Cm history at unmount.');
   }
 
   startRecording() {
@@ -231,8 +251,8 @@ class SimplerCodeMirror extends Component {
   }
 
   recordAction = (cm, action) => {
-    console.log('recordAction, this.props.mode:',  this.props.mode, 'this.justStoppedRecording:', this.justStoppedRecording);
     if ((this.props.mode === 'recording') && !this.justStoppedRecording) {
+      console.log('recordAction, this.props.mode:',  this.props.mode, 'this.justStoppedRecording:', this.justStoppedRecording);
       var timeOffset = new Date().getTime() - this.recordingStartTime;
       var historyItem = {
         type: action.type,
@@ -313,7 +333,6 @@ class SimplerCodeMirror extends Component {
   }
   
   handleScroll = (cm,action) => {
-    console.log('scrolled',action);
     var scrollInfo = cm.getScrollInfo();
     var cleanedScrollInfo = { top: scrollInfo.top, left: scrollInfo.left };
     this.recordAction(cm, { type: 'scroll', record: cleanedScrollInfo });;

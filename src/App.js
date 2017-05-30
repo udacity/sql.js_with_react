@@ -28,14 +28,7 @@ import React, { Component } from 'react';
 import update from 'react-addons-update';
 import Tabs from 'react-simpletabs';
 import '../node_modules/react-simpletabs/lib/react-simpletabs.css';
-import Button from './Button';
-import PreviewPanel from './PreviewPanel';
-import RecordStoragePanel from './RecordStoragePanel';
-import Cursor from './Cursor';
-import RecordAudio from './RecordAudio';
-import HistoryControl from './HistoryControl';
-import SimplerCodeMirror from './SimplerCodeMirror';
-import Xterm from './Xterm';
+import Layout from './Layout';
 import './App.css';
 import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
@@ -229,90 +222,36 @@ class App extends Component {
 
   render() {
     //console.log(this.state.userQuery);
+    var layoutPackage = {
+      data: {
+        mode: this.state.mode,
+        scrubPoint: this.state.playbackInfo.furthestPointReached,
+        firstRecordingComplete: this.state.recordingInfo.firstRecordingComplete,
+        cmOptions: this.state.cmOptions,
+        duration: this.state.recordingInfo.duration,
+        sliderValue: this.state.sliderValue,        
+      },
+      functions: {
+        storeRecordedPart: this.storeRecordedPart.bind(this),
+        startRecording: this.startRecording.bind(this),
+        stopRecording: this.stopRecording.bind(this),
+        startStopPlayback: this.startStopPlayback.bind(this),
+        scrub: this.scrub.bind(this),
+        updateSlider: this.updateSlider.bind(this),
+      }
+    };
+
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
 
       <Tabs>
-      <Tabs.Panel title='Instruction'>
-
-      <div className="topPanels">
-      <div className="topLeftPanels">
-      <SimplerCodeMirror 
-      mode={this.state.mode} 
-            scrubPoint={this.state.playbackInfo.furthestPointReached}
-            options={this.state.cmOptions}
-            storeRecordedPart={this.storeRecordedPart.bind(this)}      
-          />
-  
-          <Xterm 
-            mode={this.state.mode} 
-            scrubPoint={this.state.playbackInfo.furthestPointReached}
-            storeRecordedPart={this.storeRecordedPart.bind(this)}      
-          />
-        </div>
-        <div className="topRightPanels">
-         <PreviewPanel
-           mode={this.state.mode} 
-           scrubPoint={this.state.playbackInfo.furthestPointReached}
-         />
-        </div>
-        <Cursor id="cursor" 
-          mode={this.state.mode} 
-          scrubPoint={this.state.playbackInfo.furthestPointReached} 
-          storeRecordedPart={this.storeRecordedPart.bind(this)}
-        />
-      </div>
-
-
-      <div className="bottomPanels">
-
-      <div className="recordPlayControls">
-      <div className="controlBtns">
-      <Button 
-      disabled={this.state.mode === 'playback' } 
-      click={() => {(this.state.mode === 'recording' ? this.stopRecording() : this.startRecording() ) }}
-      label={(this.state.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
-      title={`Make Recording`}
-      />
-      
-      <Button 
-      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-      click={() => this.startStopPlayback()  } 
-      label={(this.state.mode === 'playback' ? <i className="fa fa-pause" ></i> : <i className="fa fa-play" ></i>) } 
-      title={`Play/Stop`}
-      />
-      </div>
-
-      <HistoryControl 
-      mode={this.state.mode} 
-      scrub={this.scrub}
-      disabled={ this.state.mode === 'recording' || !this.state.recordingInfo.firstRecordingComplete } 
-      duration={this.state.recordingInfo.duration} 
-      updateSlider={this.updateSlider} 
-      newSliderValue={this.state.sliderValue} 
-      />
-      </div>
-
-      <RecordAudio 
-      mode={this.state.mode} 
-      saveAudioForPlayback={(audioUrl) => this.saveAudioForPlayback(audioUrl) } 
-      storeRecordedPart={this.storeRecordedPart.bind(this)}      
-      />
-
-      <RecordStoragePanel
-        mode={this.state.mode} 
-        recordedParts={this.state.recordedParts}
-      />
-      </div>
-
+      <Tabs.Panel title='Instructor'>
+      <Layout package={layoutPackage} usage='instruction' />
       </Tabs.Panel>
 
-      <Tabs.Panel title='Fork #1'>
-      <h2>Fork #1 here</h2>
+      <Tabs.Panel title='Student Fork'>
       </Tabs.Panel>
-      <Tabs.Panel title='Fork #2'>
-      <h2>Fork #2 here</h2>
-      </Tabs.Panel>
+
       </Tabs>
 
       </div>

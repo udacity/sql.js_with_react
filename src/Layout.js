@@ -11,44 +11,15 @@ import Xterm from './Xterm';
 class Layout extends Component {
 
   render() {
-    return  (
-      <div className="layout">
-
-      <Cursor id="cursor" 
-      mode={this.props.package.data.mode} 
-      scrubPoint={this.props.package.data.scrubPoint} 
-      storeRecordedPart={this.props.package.functions.storeRecordedPart}
-      />
-
-      <div className="topPanels">
-      <div className="topLeftPanels">
-      <SimplerCodeMirror 
-      mode={this.props.package.data.mode} 
-      scrubPoint={this.props.package.data.scrubPoint}
-      options={this.props.package.data.cmOptions}
-      storeRecordedPart={this.props.package.functions.storeRecordedPart}      
-      />
-      
-      <Xterm 
-      mode={this.props.package.data.mode} 
-      scrubPoint={this.props.package.data.scrubPoint}
-      storeRecordedPart={this.props.package.functions.storeRecordedPart}      
-      />
-      </div>
-      <div className="topRightPanels">
-      <PreviewPanel
-      mode={this.props.package.data.mode} 
-      scrubPoint={this.props.package.data.scrubPoint}
-      />
-      </div>
-      </div>
-
-      <div className="bottomPanels" style={{display: (this.props.usage === 'instruction' ? 'block' : 'none') }} >
-
-      <div className="recordPlayControls">
-      <div className="controlBtns">
-      <Button 
-      disabled={this.props.package.data.mode === 'playback' } 
+    var bottomPanelsContent;
+    if (this.props.usage === 'instruction') {
+      bottomPanelsContent = (
+        <div className="bottomPanels">
+        
+        <div className="recordPlayControls">
+        <div className="controlBtns">
+        <Button 
+        disabled={this.props.package.data.mode === 'playback' } 
       click={() => {(this.props.package.data.mode === 'recording' ? this.props.package.functions.stopRecording() : this.props.package.functions.startRecording() ) }}
       label={(this.props.package.data.mode === 'recording' ? <i className="fa fa-pause" ></i> : <i className="fa fa-square record-button" ></i>) } 
       title={`Make Recording`}
@@ -76,16 +47,59 @@ class Layout extends Component {
       <RecordAudio 
       mode={this.props.package.data.mode} 
       saveAudioForPlayback={(audioUrl) => this.props.package.functions.saveAudioForPlayback(audioUrl) } 
-         storeRecordedPart={this.props.package.functions.storeRecordedPart}      
-        />
+      storeRecordedPart={this.props.package.functions.storeRecordedPart}      
+      />
 
-        <RecordStoragePanel
-         mode={this.props.package.data.mode} 
-         recordedParts={this.props.package.data.recordedParts}
-        />
+      <RecordStoragePanel
+      mode={this.props.package.data.mode} 
+      recordedParts={this.props.package.data.recordedParts}
+      />
 
       </div>
+      );
+    } else {
+      bottomPanelsContent = (
+        <span>&nbsp;</span>
+      )
+    }
 
+    var panelId = 'panel-' + this.props.usage;
+    var cmPanelId = 'CM-' + panelId;
+
+    return  (
+        <div className="layout" key={panelId} >
+
+        <Cursor id="cursor" 
+        mode={this.props.package.data.mode} 
+      scrubPoint={this.props.package.data.scrubPoint} 
+      storeRecordedPart={this.props.package.functions.storeRecordedPart}
+      />
+
+      <div className="topPanels">
+      <div className="topLeftPanels">
+      <SimplerCodeMirror 
+      panelId={cmPanelId}
+      mode={this.props.package.data.mode} 
+      scrubPoint={this.props.package.data.scrubPoint}
+      options={this.props.package.data.cmOptions}
+      storeRecordedPart={this.props.package.functions.storeRecordedPart}      
+      />
+      
+      <Xterm 
+      mode={this.props.package.data.mode} 
+      scrubPoint={this.props.package.data.scrubPoint}
+      storeRecordedPart={this.props.package.functions.storeRecordedPart}      
+      />
+      </div>
+      <div className="topRightPanels">
+      <PreviewPanel
+      mode={this.props.package.data.mode} 
+      scrubPoint={this.props.package.data.scrubPoint}
+      />
+      </div>
+      </div>
+
+      { bottomPanelsContent }
 
     </div>
     );

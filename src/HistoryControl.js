@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Range from './Range';
 
+// Serious hack to avoid setting up redux for now
+let previousSliderValue = undefined;
+
 class HistoryControl extends Component {
   constructor(props, context) {
     super(props, context)
@@ -17,11 +20,22 @@ class HistoryControl extends Component {
     }
   }
 
+  componentDidMount() {
+    if (previousSliderValue) {
+      this.setState({currentSliderValue: previousSliderValue});
+    }
+  }
+
+  componentWillUnmount() {
+    previousSliderValue = this.state.currentSliderValue;
+  }
+  
   handleOnChange(e) {
     var value = Number(e.target.value);
     this.setState({currentSliderValue:value});
     console.log('change complete, scrubbing to :', value);
-    this.props.scrub(value, this.state.maxRange);
+    var percentage = value / this.state.maxRange;
+    this.props.scrub(percentage, value);
   }
 
   handleOnChangeComplete(e) {

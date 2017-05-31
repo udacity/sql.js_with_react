@@ -33,7 +33,6 @@ import './App.css';
 import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
 
-
 class App extends Component {
 
   constructor(props) {
@@ -50,6 +49,14 @@ class App extends Component {
     this.scrub = this.scrub.bind(this);
   }
 
+  componentDidMount() {
+    console.log('App mount.');
+  }
+
+  componentWillUnmount() {
+    console.log('App unmount.');
+  }
+  
   stopPlayback = () => {
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
@@ -196,13 +203,13 @@ class App extends Component {
   }
 
   // Scrub to a particular location
-  scrub(value, sliderMaxRange) {
+  scrub(percentage, sliderValue) {
     this.stopPlayback();
-    var percentagePlayed = this.state.recordingInfo.duration * (value / sliderMaxRange);
+    var percentagePlayed = this.state.recordingInfo.duration * percentage;
     if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
       const newState = update(this.state, {
         mode: { $set: 'scrub' },
-        sliderValue: { $set: value },
+        sliderValue: { $set: sliderValue },
         playbackInfo: {
           $merge: {
             furthestPointReached: percentagePlayed
@@ -220,6 +227,16 @@ class App extends Component {
     //console.log('app.js: set sliderValue=', newSliderValue);
   }
 
+  handleTabsBeforeChange(selectedIndex, $selectedPanel, $selectedTabMenu) {
+    console.log('handleTabsBeforeChange, selectedIndex:', selectedIndex);
+    if (selectedIndex === 1) { // switching back to instructor tab
+      if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
+        var percentage = this.state.playbackInfo.furthestPointReached / this.state.recordingInfo.duration;
+        this.scrub(percentage);
+      }
+    }
+  }
+  
   render() {
     //console.log(this.state.userQuery);
     var layoutPackage = {
@@ -238,18 +255,20 @@ class App extends Component {
         startStopPlayback: this.startStopPlayback.bind(this),
         scrub: this.scrub.bind(this),
         updateSlider: this.updateSlider.bind(this),
+        saveAudioForPlayback: this.saveAudioForPlayback.bind(this)
       }
     };
 
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
 
-      <Tabs>
+      <Tabs onBeforeChange={this.handleTabsBeforeChange.bind(this)} >
       <Tabs.Panel title='Instructor'>
       <Layout package={layoutPackage} usage='instruction' />
       </Tabs.Panel>
 
-      <Tabs.Panel title='Student Fork'>
+      <Tabs.Panel title='Your Fork'>
+      <Layout package={layoutPackage} usage='student' />
       </Tabs.Panel>
 
       </Tabs>

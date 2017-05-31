@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import FontAwesome from 'react-fontawesome';
 
 // Serious hack to avoid setting up redux for now
-let previousCursorMotion = undefined;
+let previousCursorInfo = undefined;
 
 class Cursor extends Component {
   constructor(props) {
@@ -21,15 +21,22 @@ class Cursor extends Component {
 
   componentDidMount() {
     this.saveCursorLocation();
-    if (previousCursorMotion !== undefined) {
-      this.cursorMotion = previousCursorMotion.slice();
+    if (previousCursorInfo !== undefined) {
+      this.cursorMotion = previousCursorInfo.cursorMotion.slice();
+      this.cursorMotionIndex = previousCursorInfo.cursorMotionIndex;
+      this.previousPlayDuration = previousCursorInfo.previousPlayDuration;
+      this.setState({position: { x: this.cursorMotion[this.cursorMotionIndex].x, y: this.cursorMotion[this.cursorMotionIndex].x}});
       console.log('Restored cursor history');
     }
   }
 
   componentWillUnmount() {
     if (this.cursorMotion) {
-      previousCursorMotion = this.cursorMotion.slice();
+      previousCursorInfo = { 
+        cursorMotion: this.cursorMotion.slice(),
+        cursorMotionIndex:  this.cursorMotionIndex,
+        previousPlayDuration: this.previousPlayDuration
+      }
       console.log('Saved cursor history.');
     }
   }

@@ -46,9 +46,9 @@ class SimplerCodeMirror extends Component {
 
         if (previousCmHistory) {
           this.history = previousCmHistory.history.slice();
-          this.initialCmContents = data,
+          this.initialCmContents = data;
           this.initialCursorPos  = this.cm.getCursor();
-          this.rewindToBeginning();
+          this.scrub(previousCmHistory.furthestPointReached);
           console.log('Restored previously recorded history.');
         }
 
@@ -93,8 +93,9 @@ class SimplerCodeMirror extends Component {
   componentWillUnmount() {
     previousCmHistory = { 
       history: this.history.slice(),
-      initialCmContents: this.initialCmContents,
-      initialCursorPos:  this.initialCursorPos,
+      initialCmContents:    this.initialCmContents,
+      initialCursorPos:     this.initialCursorPos,
+      furthestPointReached: this.furthestPointReached
     }
     console.log('Saved Cm history at unmount.');
   }
@@ -139,9 +140,14 @@ class SimplerCodeMirror extends Component {
     this.furthestPointReached = new Date().getTime() - this.replayStartTime;
   }
   
-  rewindContentsToBeginning() {
+  rewindContentsToBeginning(lastScrollMarker) {
     this.cm.setValue(this.initialCmContents);
-    this.cm.scrollTo(0,0);
+    if (lastScrollMarker && lastScrollMarker > 0) {
+      var record = this.history[lastScrollMarker].record;
+      this.cm.scrollTo(record.left, record.top);
+    } else {
+      this.cm.scrollTo(0,0);
+    }
   }
   
   rewindToBeginning() {
@@ -209,25 +215,31 @@ class SimplerCodeMirror extends Component {
     console.log('SimplerCodeMirror scrubbing to:', scrubPoint);
     this.scrubPoint = scrubPoint;
     var lastChangeMarker = 0;
+    var lastScrollMarker = 0;
     if (this.history.length > 0) {
       var scan = 0;
       while ((this.history[scan].timeOffset < scrubPoint) && (scan < this.history.length - 1)) {
         ++scan;
         if (this.history[scan].type === 'change') {
           lastChangeMarker = scan;
+        } else if (this.history[scan].type === 'scroll') {
+          lastScrollMarker = scan;
         }
       }
       if (this.history[scan].timeOffset > scrubPoint) {
         scan = Math.max(0, scan - 1);
         if (this.history[scan].type === 'change') {
           lastChangeMarker = scan;
+          lastScrollMarker = scan;
         }
       }
       this.lastPlayMarker = scan;
       this.furthestPointReached = scrubPoint; // scrubPoint is a time value in ms
+      console.log('SimplerCodeMirror can scrub.');
       if (lastChangeMarker === 0) {
-        this.rewindContentsToBeginning();
+        this.rewindContentsToBeginning(lastScrollMarker);
       } else {
+        console.log('SimplerCodeMirror: calling runChange from scrub');
         this.runChange(this.history[lastChangeMarker]);
       }
     }

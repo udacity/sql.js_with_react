@@ -7,7 +7,7 @@ import React, { Component } from 'react';
 //require('../public/addons/fit/fit');
 
 // Serious hack to avoid setting up redux for now
-let previousXtermHistory = undefined;
+let previousXtermInfo = undefined;
 
 class Xterm extends Component {
   constructor(props) {
@@ -31,17 +31,24 @@ class Xterm extends Component {
   }
 
   componentDidMount() {
-    console.log('Xterm just mounted.');
+    console.log('Xterm mount.');
     this.constructTerminal();
-    if (previousXtermHistory) {
-      this.history = previousXtermHistory.slice();
+    if (previousXtermInfo) {
+      this.history = previousXtermInfo.history.slice();
+      this.furthestPointReached = previousXtermInfo.furthestPointReached;
       console.log('Restored xterm history at mount.');
+    } else {
+      this.history = [];
     }
   }
 
   componentWillUnmount() {
+    console.log('Xterm unmount.');
     if (this.history && this.history.length > 0) {
-      previousXtermHistory = this.history.slice();
+      previousXtermInfo = {
+        history: this.history.slice(),
+        furthestPointReached: this.furthestPointReached
+      }
       console.log('Saved Xterm history at unmount.');
     }
   }

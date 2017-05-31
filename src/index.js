@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
+import { Provider } from 'react-redux';
+import configureStore from './store/configureStore';
+
+const store = configureStore(); // You can also pass in an initialState here
 
 function getParameterByName(name, url) {
   if (!url) url = window.location.href;
@@ -13,6 +17,6 @@ function getParameterByName(name, url) {
 }
 
 ReactDOM.render(
-  <App query={getParameterByName("q")} useHeader={getParameterByName("h")}/>,
+  <Provider store={store} ><App query={getParameterByName("q")} useHeader={getParameterByName("h")}/></Provider>,
   document.getElementById('root')
 );

@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import FontAwesome from 'react-fontawesome';
 
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { storeCursorInfo } from './actions/cursor';
+
 // Serious hack to avoid setting up redux for now
 let previousCursorInfo = undefined;
 
@@ -44,6 +48,7 @@ class Cursor extends Component {
   saveCursorLocation() {
     window.onmousemove = (e) => { 
       this.cursorPosition = { x: e.pageX, y: e.pageY };
+      console.log('saving cursor position');
     };
   }
 
@@ -196,5 +201,23 @@ class Cursor extends Component {
   }
 }
 
-export default Cursor;
+Cursor.propTypes = {
+  storeCursorInfo: PropTypes.func.isRequired
+};
+
+const mapStateToProps = (state) => {
+  return {
+    cursorInfo: state.position
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    storeCursorInfo: (cursorInfo) => dispatch(cursorAction(cursorInfo))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cursor);
+
+//export default Cursor;
 

@@ -1,0 +1,6 @@
+export function saveCursorInfo(cursorInfo) {
+  return {
+    type: 'SAVE_CURSOR_INFO',
+    cursorInfo
+  };
+}

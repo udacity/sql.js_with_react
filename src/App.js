@@ -26,6 +26,7 @@
 
 import React, { Component } from 'react';
 import update from 'react-addons-update';
+
 import Tabs from 'react-simpletabs';
 import '../node_modules/react-simpletabs/lib/react-simpletabs.css';
 import Layout from './Layout';

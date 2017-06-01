@@ -44,6 +44,7 @@ class App extends Component {
       playbackInfo: {},
       sliderValue: 0,
       cmOptions: { historyEventDelay: 50, lineNumbers:true },
+      refork: false,
     };
 
     this.usage = 'instructor'; // hack
@@ -236,6 +237,20 @@ class App extends Component {
     //console.log('app.js: set sliderValue=', newSliderValue);
   }
 
+  newFork() {
+    setTimeout( () => {
+      this.setState({activeTab: 2, refork: true}, () => {
+        this.usage = 'student';
+      });
+    }, 1000);
+  }
+
+  existingFork() {
+    this.setState({activeTab: 2, refork: false}, () => {
+      this.usage = 'student';
+    });
+  }
+    
   setUsage(newUsage) {
     this.usage = newUsage;
   }
@@ -247,7 +262,7 @@ class App extends Component {
   handleTabsBeforeChange(selectedIndex, $selectedPanel, $selectedTabMenu) {
     console.log('handleTabsBeforeChange, selectedIndex:', selectedIndex);
     if (selectedIndex === 2) {
-      this.setUsage('student'); // hack
+      this.setState({refork:true}, () => { this.setUsage('student'); }); // hack
     } else if (selectedIndex === 1) { // switching back to instructor tab
       this.setUsage('instructor');
       if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
@@ -261,32 +276,35 @@ class App extends Component {
     //console.log(this.state.userQuery);
     var layoutPackage = {
       data: {
-        mode: this.state.mode,
-        scrubPoint: this.state.playbackInfo.furthestPointReached,
-        firstRecordingComplete: this.state.recordingInfo.firstRecordingComplete,
-        recordedParts: this.state.recordedParts,
-        cmOptions: this.state.cmOptions,
-        duration: this.state.recordingInfo.duration,
-        sliderValue: this.state.sliderValue,
-        cmRecord: this.state.cmRecord
+        mode:                    this.state.mode,
+        scrubPoint:              this.state.playbackInfo.furthestPointReached,
+        firstRecordingComplete:  this.state.recordingInfo.firstRecordingComplete,
+        recordedParts:           this.state.recordedParts,
+        cmOptions:               this.state.cmOptions,
+        duration:                this.state.recordingInfo.duration,
+        sliderValue:             this.state.sliderValue,
+        cmRecord:                this.state.cmRecord,
+        refork:                  this.state.refork,
       },
       functions: {
-        storeRecordedPart: this.storeRecordedPart.bind(this),
+        storeRecordedPart:       this.storeRecordedPart.bind(this),
         storeInstructorCmRecord: this.storeInstructorCmRecord.bind(this),
-        startRecording: this.startRecording.bind(this),
-        stopRecording: this.stopRecording.bind(this),
-        startStopPlayback: this.startStopPlayback.bind(this),
-        scrub: this.scrub.bind(this),
-        updateSlider: this.updateSlider.bind(this),
-        saveAudioForPlayback: this.saveAudioForPlayback.bind(this),
-        getUsage: this.getUsage.bind(this),
+        startRecording:          this.startRecording.bind(this),
+        stopRecording:           this.stopRecording.bind(this),
+        startStopPlayback:       this.startStopPlayback.bind(this),
+        scrub:                   this.scrub.bind(this),
+        updateSlider:            this.updateSlider.bind(this),
+        saveAudioForPlayback:    this.saveAudioForPlayback.bind(this),
+        getUsage:                this.getUsage.bind(this),
+        newFork:                 this.newFork.bind(this),
+        existingFork:            this.existingFork.bind(this),
       }
     };
 
     return (
       <div className="App" ref={(node) => {this.node = node;}} >
 
-      <Tabs onBeforeChange={this.handleTabsBeforeChange.bind(this)} >
+      <Tabs onBeforeChange={this.handleTabsBeforeChange.bind(this)} tabActive={this.state.activeTab} >
       <Tabs.Panel title='Instructor'>
       <Layout package={layoutPackage} usage='instruction' />
       </Tabs.Panel>

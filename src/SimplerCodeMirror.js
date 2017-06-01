@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import '../node_modules/codemirror/mode/javascript/javascript';
 
+import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import 
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css 
+
+
 // Serious hack to avoid setting up redux for now
 let previousCmHistory = undefined;
+let studentRecord = undefined;
 
 class SimplerCodeMirror extends Component {
 
@@ -17,6 +22,10 @@ class SimplerCodeMirror extends Component {
     this.exampleJs = '// loading... '
     this.scrubPoint = 0;
     this.postScrubAction = undefined;
+
+    this.state = {
+      showDialog: false
+    }
 
     this.initializeContents = this.initializeContents.bind(this);
   }
@@ -52,12 +61,18 @@ class SimplerCodeMirror extends Component {
         this.scrub(previousCmHistory.furthestPointReached);
         console.log('Restored previously recorded history.');
       } else if (this.usage === 'student') {
-        console.log('Duplicating instructor code in student setup.');
         if (this.props.cmRecord) {
-          this.initialCmContents = this.props.cmRecord.contents;
-          this.cm.setValue(this.initialCmContents);
-          this.cm.scrollTo(this.props.cmRecord.scrollInfo.left,this.props.cmRecord.scrollInfo.top);
-          this.cm.setCursor(this.props.cmRecord.cursorInfo);        
+          console.log('Duplicating instructor code in student setup.');
+          var sourceRecord;
+          if (this.props.refork) {
+            sourceRecord = this.props.cmRecord;
+          } else {
+            sourceRecord = studentRecord;
+          }
+          this.initialCmContents = sourceRecord.contents;
+          this.cm.setValue (sourceRecord.contents);
+          this.cm.scrollTo (sourceRecord.scrollInfo.left,sourceRecord.scrollInfo.top);
+          this.cm.setCursor(sourceRecord.cursorInfo);        
         }
       }
     }
@@ -120,7 +135,12 @@ class SimplerCodeMirror extends Component {
       }
       console.log('Saved Cm history at unmount.');
     } else {
-      console.log('did not save CM history because student usage');
+      console.log('did not save CM history because student usage, but saving student fork');
+      studentRecord = {
+        contents:             this.cm.getValue(),
+        cursorInfo:           this.cm.getCursor(),
+        scrollInfo:           this.cm.getScrollInfo(),        
+      }
     }
   }
 
@@ -315,7 +335,6 @@ class SimplerCodeMirror extends Component {
       fileData: contents, 
       destination:'/Users/will/Documents/Development/nd-react/two/myreads/src'
     });
-
     fetch(url, {
       method: 'POST', 
       headers: {
@@ -324,6 +343,14 @@ class SimplerCodeMirror extends Component {
       },
       body:persister
     });
+
+    console.log('current mode:', this.props.mode);
+    if (this.props.mode === 'configuration') {      
+      if (this.usage === 'instructor') {
+        this.setState({showDialog:true});
+      }
+    }
+
     if (action.origin === 'playback') {
       //console.log('Ignoring this change since it came from a recorded playback.');
     } else if (action.origin === 'setValue') {
@@ -380,8 +407,21 @@ class SimplerCodeMirror extends Component {
 
   render() {
     return  (
+      <div>
       <div className='editorDiv'>
-        <textarea ref='textarea' name='codemirror_textarea' defaultValue={this.exampleJs} autoComplete='off' />
+      <textarea ref='textarea' name='codemirror_textarea' defaultValue={this.exampleJs} autoComplete='off' />
+      </div>
+      {
+        false &&
+        <ReactConfirmAlert
+        title="Make a New Fork?"
+        message="You forked this code previously. Do you want to make a fresh fork at this point in the video?"
+        confirmLabel="Yes, Make A New Fork"
+        cancelLabel="No, Use My Existing Fork"
+        onConfirm={() => { this.setState({showDialog: false}, () => { this.props.newFork(); })      } }
+        onCancel={() =>  { this.setState({showDialog: false}, () => { this.props.existingFork(); }) } }
+        />
+      }
       </div>
     );
   } 

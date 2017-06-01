@@ -9,6 +9,7 @@
     "react": "^15.5.4",
     "react-addons-update": "^15.5.2",
     "react-codemirror": "^0.3.0",
+    "react-confirm-alert": "^1.0.5",
     "react-dom": "^15.5.4",
     "react-fontawesome": "^1.6.1",
     "react-json-tree": "^0.10.9",

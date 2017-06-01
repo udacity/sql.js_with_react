@@ -85,8 +85,11 @@ class Layout extends Component {
       options={this.props.package.data.cmOptions}
       storeRecordedPart={this.props.package.functions.storeRecordedPart}      
       cmRecord={this.props.package.data.cmRecord}
+      refork={this.props.package.data.refork}
       storeInstructorCmRecord={this.props.package.functions.storeInstructorCmRecord}
       getUsage={this.props.package.functions.getUsage}
+      newFork={this.props.package.functions.newFork}
+      existingFork={this.props.package.functions.existingFork}
       />
       
       <Xterm 

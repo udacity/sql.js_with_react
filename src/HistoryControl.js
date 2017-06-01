@@ -39,8 +39,8 @@ class HistoryControl extends Component {
   }
 
   handleOnChangeComplete(e) {
-    var value = Number(e.target.value);
-    console.log('change complete, scrubbing to :', value);
+    //var value = Number(e.target.value);
+    //console.log('change complete, scrubbing to :', value);
     // 
   }
   

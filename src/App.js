@@ -46,6 +46,7 @@ class App extends Component {
       cmOptions: { historyEventDelay: 50, lineNumbers:true },
     };
 
+    this.usage = 'instructor'; // hack
     this.scrub = this.scrub.bind(this);
   }
 
@@ -70,7 +71,7 @@ class App extends Component {
       }
     });
     this.setState(newState);
-    console.log('stopPlayback just set state');
+    //console.log('stopPlayback just set state');
 
     if (this.audioObj) {
       this.audioObj.pause();
@@ -182,6 +183,13 @@ class App extends Component {
     }));
   }
   
+  storeInstructorCmRecord(record) {
+    const newState = update(this.state, {
+      cmRecord: { $set: record }
+    });
+    this.setState(newState);
+  }
+
   updatePlaybackTimer = () => {
     var now = new Date().getTime();
     var playedBackThisTime = now - this.state.playbackInfo.startTime;
@@ -227,9 +235,20 @@ class App extends Component {
     //console.log('app.js: set sliderValue=', newSliderValue);
   }
 
+  setUsage(newUsage) {
+    this.usage = newUsage;
+  }
+  
+  getUsage() {
+    return(this.usage);
+  }
+
   handleTabsBeforeChange(selectedIndex, $selectedPanel, $selectedTabMenu) {
     console.log('handleTabsBeforeChange, selectedIndex:', selectedIndex);
-    if (selectedIndex === 1) { // switching back to instructor tab
+    if (selectedIndex === 2) {
+      this.setUsage('student'); // hack
+    } else if (selectedIndex === 1) { // switching back to instructor tab
+      this.setUsage('instructor');
       if (this.state.recordingInfo.firstRecordingComplete !== undefined) {
         var percentage = this.state.playbackInfo.furthestPointReached / this.state.recordingInfo.duration;
         this.scrub(percentage);
@@ -244,18 +263,22 @@ class App extends Component {
         mode: this.state.mode,
         scrubPoint: this.state.playbackInfo.furthestPointReached,
         firstRecordingComplete: this.state.recordingInfo.firstRecordingComplete,
+        recordedParts: this.state.recordedParts,
         cmOptions: this.state.cmOptions,
         duration: this.state.recordingInfo.duration,
-        sliderValue: this.state.sliderValue,        
+        sliderValue: this.state.sliderValue,
+        cmRecord: this.state.cmRecord
       },
       functions: {
         storeRecordedPart: this.storeRecordedPart.bind(this),
+        storeInstructorCmRecord: this.storeInstructorCmRecord.bind(this),
         startRecording: this.startRecording.bind(this),
         stopRecording: this.stopRecording.bind(this),
         startStopPlayback: this.startStopPlayback.bind(this),
         scrub: this.scrub.bind(this),
         updateSlider: this.updateSlider.bind(this),
-        saveAudioForPlayback: this.saveAudioForPlayback.bind(this)
+        saveAudioForPlayback: this.saveAudioForPlayback.bind(this),
+        getUsage: this.getUsage.bind(this),
       }
     };
 

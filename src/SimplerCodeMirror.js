@@ -17,6 +17,8 @@ class SimplerCodeMirror extends Component {
     this.exampleJs = '// loading... '
     this.scrubPoint = 0;
     this.postScrubAction = undefined;
+
+    this.initializeContents = this.initializeContents.bind(this);
   }
 
   getXtermHost() {
@@ -30,36 +32,52 @@ class SimplerCodeMirror extends Component {
     }
   }
 
+  initializeContents(newContents) {
+    var textAreaNode = this.findDOMNode(this.refs.textarea);
+    this.cm = this.CodeMirror.fromTextArea(textAreaNode, this.props.options);
+    this.cm.setValue(newContents);
+
+    // Remove first setValue() from history so that can never be undone
+    var history = this.cm.getHistory();
+    history.done.shift();
+    history.done.shift();
+    this.cm.setHistory(history);
+    this.initialCmContents = newContents;
+    this.initialCursorPos  = this.cm.getCursor();
+
+    if (previousCmHistory) {
+      console.log('Found previous CM history, usage:', this.usage);
+      if (this.usage === 'instructor') {
+        this.history = previousCmHistory.history.slice();
+        this.scrub(previousCmHistory.furthestPointReached);
+        console.log('Restored previously recorded history.');
+      } else if (this.usage === 'student') {
+        console.log('Duplicating instructor code in student setup.');
+        if (this.props.cmRecord) {
+          this.initialCmContents = this.props.cmRecord.contents;
+          this.cm.scrollTo(this.props.cmRecord.scrollInfo.left,this.props.cmRecord.scrollInfo.top);
+          this.cm.setCursor(this.props.cmRecord.cursorInfo);        
+        }
+      }
+    }
+
+    this.cm.on('change', this.handleChange);
+    this.cm.on('cursorActivity', this.handleCursorActivity);
+    this.cm.on('scroll', this.handleScroll);
+    window.cm = this.cm;
+    window.cm.focus(); 
+    var cursorInfo = this.cm.getCursor();
+    console.log('at startup, cursorInfo:', cursorInfo);
+
+  }
+
   componentDidMount() {
+    console.log('CM did mount');
+    this.usage = this.props.getUsage();
+
     fetch(`/ListBooks.js`)
       .then(response => response.text() )
-      .then(data => {
-        var textAreaNode = this.findDOMNode(this.refs.textarea);
-        this.cm = this.CodeMirror.fromTextArea(textAreaNode, this.props.options);
-        this.cm.setValue(data);
-
-        // Remove first setValue() from history so that can never be undone
-        var history = this.cm.getHistory();
-        history.done.shift();
-        history.done.shift();
-        this.cm.setHistory(history);
-
-        if (previousCmHistory) {
-          this.history = previousCmHistory.history.slice();
-          this.initialCmContents = data;
-          this.initialCursorPos  = this.cm.getCursor();
-          this.scrub(previousCmHistory.furthestPointReached);
-          console.log('Restored previously recorded history.');
-        }
-
-        this.cm.on('change', this.handleChange);
-        this.cm.on('cursorActivity', this.handleCursorActivity);
-        this.cm.on('scroll', this.handleScroll);
-        window.cm = this.cm;
-        window.cm.focus(); 
-        var cursorInfo = this.cm.getCursor();
-        console.log('at startup, cursorInfo:', cursorInfo);
-      });
+      .then(data => { this.initializeContents(data) } );
   }  
 
   componentWillReceiveProps(nextProps) {
@@ -91,13 +109,18 @@ class SimplerCodeMirror extends Component {
   }
 
   componentWillUnmount() {
-    previousCmHistory = { 
-      history: this.history.slice(),
-      initialCmContents:    this.initialCmContents,
-      initialCursorPos:     this.initialCursorPos,
-      furthestPointReached: this.furthestPointReached
+    console.log('CM will unmount, usage:', this.usage);
+    if (this.usage === 'instructor') {
+      previousCmHistory = { 
+        history:              this.history.slice(),
+        initialCmContents:    this.initialCmContents,
+        initialCursorPos:     this.initialCursorPos,
+        furthestPointReached: this.furthestPointReached || 0
+      }
+      console.log('Saved Cm history at unmount.');
+    } else {
+      console.log('did not save CM history because student usage');
     }
-    console.log('Saved Cm history at unmount.');
   }
 
   startRecording() {
@@ -166,6 +189,7 @@ class SimplerCodeMirror extends Component {
     this.cm.setValue(record.contents);
     this.cm.scrollTo(record.scrollInfo.left, record.scrollInfo.top);
     this.cm.setCursor(record.cursorInfo);
+    this.props.storeInstructorCmRecord(record);
   }
 
   playHistory = () => {
@@ -235,7 +259,7 @@ class SimplerCodeMirror extends Component {
       }
       this.lastPlayMarker = scan;
       this.furthestPointReached = scrubPoint; // scrubPoint is a time value in ms
-      console.log('SimplerCodeMirror can scrub.');
+      // console.log('SimplerCodeMirror can scrub.');
       if (lastChangeMarker === 0) {
         this.rewindContentsToBeginning(lastScrollMarker);
       } else {
@@ -278,7 +302,7 @@ class SimplerCodeMirror extends Component {
   }
   
   handleChange = (cm,action) => {
-    console.log('Change:',action);
+    //console.log('Change:',action);
     var host = this.getXtermHost();
     var url = `${host.httpHost}/terminal/persist`;
     var contents = this.cm.getValue();
@@ -297,9 +321,9 @@ class SimplerCodeMirror extends Component {
       body:persister
     });
     if (action.origin === 'playback') {
-      console.log('Ignoring this change since it came from a recorded playback.');
+      //console.log('Ignoring this change since it came from a recorded playback.');
     } else if (action.origin === 'setValue') {
-      console.log('Ignoring this change since it came from a recorded playback (setValue).');
+      //console.log('Ignoring this change since it came from a recorded playback (setValue).');
     } else {
       var scrollInfo = this.cm.getScrollInfo();
       var cleanedScrollInfo = { top: scrollInfo.top, left: scrollInfo.left };

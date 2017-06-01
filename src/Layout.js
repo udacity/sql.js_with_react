@@ -34,12 +34,13 @@ class Layout extends Component {
       </div>
 
       <HistoryControl 
-      mode={this.props.package.data.mode} 
-      scrub={this.props.package.functions.scrub}
-      disabled={ this.props.package.data.mode === 'recording' || !this.props.package.data.firstRecordingComplete } 
-      duration={this.props.package.data.duration} 
-      updateSlider={this.props.package.functions.updateSlider} 
-      newSliderValue={this.props.package.data.sliderValue} 
+        mode={this.props.package.data.mode} 
+        scrub={this.props.package.functions.scrub}
+        startStopPlayback={this.props.package.functions.scrub}
+        disabled={ this.props.package.data.mode === 'recording' || !this.props.package.data.firstRecordingComplete } 
+        duration={this.props.package.data.duration} 
+        updateSlider={this.props.package.functions.updateSlider} 
+        newSliderValue={this.props.package.data.sliderValue} 
       />
 
       </div>
@@ -83,12 +84,16 @@ class Layout extends Component {
       scrubPoint={this.props.package.data.scrubPoint}
       options={this.props.package.data.cmOptions}
       storeRecordedPart={this.props.package.functions.storeRecordedPart}      
+      cmRecord={this.props.package.data.cmRecord}
+      storeInstructorCmRecord={this.props.package.functions.storeInstructorCmRecord}
+      getUsage={this.props.package.functions.getUsage}
       />
       
       <Xterm 
       mode={this.props.package.data.mode} 
       scrubPoint={this.props.package.data.scrubPoint}
       storeRecordedPart={this.props.package.functions.storeRecordedPart}      
+      getUsage={this.props.package.functions.getUsage}
       />
       </div>
       <div className="topRightPanels">

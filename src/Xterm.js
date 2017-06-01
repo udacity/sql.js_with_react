@@ -32,19 +32,13 @@ class Xterm extends Component {
 
   componentDidMount() {
     console.log('Xterm mount.');
+    this.usage = this.props.getUsage();
     this.constructTerminal();
-    if (previousXtermInfo) {
-      this.history = previousXtermInfo.history.slice();
-      this.furthestPointReached = previousXtermInfo.furthestPointReached;
-      console.log('Restored xterm history at mount.');
-    } else {
-      this.history = [];
-    }
   }
 
   componentWillUnmount() {
     console.log('Xterm unmount.');
-    if (this.history && this.history.length > 0) {
+    if (this.history && this.history.length > 0 && this.usage === 'instructor') {
       previousXtermInfo = {
         history: this.history.slice(),
         furthestPointReached: this.furthestPointReached
@@ -168,6 +162,16 @@ class Xterm extends Component {
     console.log('attaching...');
     this.term.attach(this.socket);
     this.term._initialized = true;
+
+    if ((this.usage === 'instructor') && previousXtermInfo) {
+      this.history = previousXtermInfo.history.slice();
+      this.furthestPointReached = previousXtermInfo.furthestPointReached;
+      setTimeout( () => { this.scrub(this.furthestPointReached) }, 250); // have to delay before scrubbing because terminal still not quite ready to receive IO
+      console.log('Restored xterm history at mount.');
+    } else {
+      this.history = [];
+    }
+
   }
 
   startRecording() {
@@ -244,7 +248,7 @@ class Xterm extends Component {
   }
 
   scrub(scrubPoint) {
-    console.log('xterm scrubbing to:', scrubPoint);
+    //console.log('xterm scrubbing to:', scrubPoint);
     if (this.history.length > 0) {
       var scan = 0;
       while ((this.history[scan].timeOffset < scrubPoint) && (scan < this.history.length - 1)) {

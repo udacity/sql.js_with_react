@@ -184,6 +184,7 @@ class App extends Component {
   }
   
   storeInstructorCmRecord(record) {
+    console.log('storeInstructorCmRecord');
     const newState = update(this.state, {
       cmRecord: { $set: record }
     });

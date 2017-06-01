@@ -55,6 +55,7 @@ class SimplerCodeMirror extends Component {
         console.log('Duplicating instructor code in student setup.');
         if (this.props.cmRecord) {
           this.initialCmContents = this.props.cmRecord.contents;
+          this.cm.setValue(this.initialCmContents);
           this.cm.scrollTo(this.props.cmRecord.scrollInfo.left,this.props.cmRecord.scrollInfo.top);
           this.cm.setCursor(this.props.cmRecord.cursorInfo);        
         }
@@ -153,6 +154,9 @@ class SimplerCodeMirror extends Component {
     this.lastPlayMarker = this.history.length - 1;
     this.justStoppedRecording = true;
     this.rewindToBeginning();
+    var record = this.history[this.history.length - 1];
+    record.contents = this.cm.getValue();
+    this.props.storeInstructorCmRecord(record);
   }
   
 

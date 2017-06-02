@@ -88,6 +88,7 @@ class Layout extends Component {
       refork={this.props.package.data.refork}
       storeInstructorCmRecord={this.props.package.functions.storeInstructorCmRecord}
       getUsage={this.props.package.functions.getUsage}
+      showDialog={this.props.package.functions.showDialog}
       newFork={this.props.package.functions.newFork}
       existingFork={this.props.package.functions.existingFork}
       />

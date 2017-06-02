@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import '../node_modules/codemirror/mode/javascript/javascript';
 
-import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import 
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css 
-
-
 // Serious hack to avoid setting up redux for now
 let previousCmHistory = undefined;
 let studentRecord = undefined;
@@ -22,10 +18,6 @@ class SimplerCodeMirror extends Component {
     this.exampleJs = '// loading... '
     this.scrubPoint = 0;
     this.postScrubAction = undefined;
-
-    this.state = {
-      showDialog: false
-    }
 
     this.initializeContents = this.initializeContents.bind(this);
   }
@@ -80,6 +72,7 @@ class SimplerCodeMirror extends Component {
     this.cm.on('change', this.handleChange);
     this.cm.on('cursorActivity', this.handleCursorActivity);
     this.cm.on('scroll', this.handleScroll);
+    // this.cm.on('keydown', this.handleKeyDown.bind(this));
     window.cm = this.cm;
     window.cm.focus(); 
     var cursorInfo = this.cm.getCursor();
@@ -174,7 +167,7 @@ class SimplerCodeMirror extends Component {
     this.lastPlayMarker = this.history.length - 1;
     this.justStoppedRecording = true;
     this.rewindToBeginning();
-    var record = this.history[this.history.length - 1];
+    var record = Object.assign({}, this.history[this.history.length - 1]);
     record.contents = this.cm.getValue();
     this.props.storeInstructorCmRecord(record);
   }
@@ -325,6 +318,16 @@ class SimplerCodeMirror extends Component {
     this.justStoppedRecording = false;
   }
   
+  handleKeyDown(cm, action) {
+    console.log('current mode:', this.props.mode);
+    if (this.props.mode === 'configuration') {      
+      if (this.usage === 'instructor') {
+        this.props.showDialog('Do you want to start a new fork or keep your existing fork?');
+        return false;
+      }
+    }
+  }
+
   handleChange = (cm,action) => {
     //console.log('Change:',action);
     var host = this.getXtermHost();
@@ -343,13 +346,6 @@ class SimplerCodeMirror extends Component {
       },
       body:persister
     });
-
-    console.log('current mode:', this.props.mode);
-    if (this.props.mode === 'configuration') {      
-      if (this.usage === 'instructor') {
-        this.setState({showDialog:true});
-      }
-    }
 
     if (action.origin === 'playback') {
       //console.log('Ignoring this change since it came from a recorded playback.');
@@ -407,21 +403,8 @@ class SimplerCodeMirror extends Component {
 
   render() {
     return  (
-      <div>
       <div className='editorDiv'>
       <textarea ref='textarea' name='codemirror_textarea' defaultValue={this.exampleJs} autoComplete='off' />
-      </div>
-      {
-        false &&
-        <ReactConfirmAlert
-        title="Make a New Fork?"
-        message="You forked this code previously. Do you want to make a fresh fork at this point in the video?"
-        confirmLabel="Yes, Make A New Fork"
-        cancelLabel="No, Use My Existing Fork"
-        onConfirm={() => { this.setState({showDialog: false}, () => { this.props.newFork(); })      } }
-        onCancel={() =>  { this.setState({showDialog: false}, () => { this.props.existingFork(); }) } }
-        />
-      }
       </div>
     );
   } 

@@ -29,6 +29,9 @@ import update from 'react-addons-update';
 import Tabs from 'react-simpletabs';
 import '../node_modules/react-simpletabs/lib/react-simpletabs.css';
 import Layout from './Layout';
+import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import 
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css 
+
 import './App.css';
 import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
@@ -45,6 +48,7 @@ class App extends Component {
       sliderValue: 0,
       cmOptions: { historyEventDelay: 50, lineNumbers:true },
       refork: false,
+      showDialog: false,
     };
 
     this.usage = 'instructor'; // hack
@@ -237,6 +241,20 @@ class App extends Component {
     //console.log('app.js: set sliderValue=', newSliderValue);
   }
 
+  showDialog(message) {
+    //this.setState({showDialog:true});
+    var results = confirm(message);
+    if (results) {
+      this.newFork();
+    } else {
+      this.existingFork();
+    }
+  }
+
+  hideDialog() {
+    setTimeout( () => { this.setState({showDialog:false}); }, 500);
+  }
+  
   newFork() {
     setTimeout( () => {
       this.setState({activeTab: 2, refork: true}, () => {
@@ -296,6 +314,7 @@ class App extends Component {
         updateSlider:            this.updateSlider.bind(this),
         saveAudioForPlayback:    this.saveAudioForPlayback.bind(this),
         getUsage:                this.getUsage.bind(this),
+        showDialog:              this.showDialog.bind(this),
         newFork:                 this.newFork.bind(this),
         existingFork:            this.existingFork.bind(this),
       }
@@ -314,6 +333,18 @@ class App extends Component {
       </Tabs.Panel>
 
       </Tabs>
+
+      {
+        this.state.showDialog &&
+        <ReactConfirmAlert
+        title="Make a New Fork?"
+        message="You forked this code previously. Do you want to make a fresh fork at this point in the video?"
+        confirmLabel="Yes, Make A New Fork"
+        cancelLabel="No, Use My Existing Fork"
+        onConfirm={ () => { this.hideDialog(); this.newFork(); } }
+        onCancel={  () =>  { this.hideDialog(); this.existingFork(); } }
+        />
+      }
 
       </div>
     );

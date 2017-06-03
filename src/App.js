@@ -29,12 +29,24 @@ import update from 'react-addons-update';
 import Tabs from 'react-simpletabs';
 import '../node_modules/react-simpletabs/lib/react-simpletabs.css';
 import Layout from './Layout';
-import ReactConfirmAlert, { confirmAlert } from 'react-confirm-alert'; // Import 
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css 
+import Button from './Button';
+import Modal from 'react-modal';
 
 import './App.css';
 import './CM.css';
 import '../node_modules/codemirror/lib/codemirror.css';
+
+const modalStyle = {
+  content : {
+    top                   : '25%',
+    left                  : '25%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-45%, -25%)'
+  }
+};
+
 
 class App extends Component {
 
@@ -48,7 +60,7 @@ class App extends Component {
       sliderValue: 0,
       cmOptions: { historyEventDelay: 50, lineNumbers:true },
       refork: false,
-      showDialog: false,
+      showDialog: true,
     };
 
     this.usage = 'instructor'; // hack
@@ -202,14 +214,14 @@ class App extends Component {
     var totalPlayedBack = this.state.playbackInfo.furthestPointReached + playedBackThisTime;
     var newSliderValue = (( totalPlayedBack / this.state.recordingInfo.duration) * 1000);
     this.updateSlider(newSliderValue);
-/*
-    console.log('now:', now, 'startTime:', this.state.playbackInfo.startTime,
-                'furthestPointReached:', this.state.playbackInfo.furthestPointReached,
-                'playedBackThisTime:', playedBackThisTime, 
-                'totalPlayedBack:', totalPlayedBack, 
-                'newSliderValue:', newSliderValue,
-                'duration:', this.state.recordingInfo.duration);
-*/
+    /*
+       console.log('now:', now, 'startTime:', this.state.playbackInfo.startTime,
+       'furthestPointReached:', this.state.playbackInfo.furthestPointReached,
+       'playedBackThisTime:', playedBackThisTime, 
+       'totalPlayedBack:', totalPlayedBack, 
+       'newSliderValue:', newSliderValue,
+       'duration:', this.state.recordingInfo.duration);
+     */
     if (totalPlayedBack >= this.state.recordingInfo.duration) {
       console.log('Ending playback from updatePlaybackTimer');
       this.stopAndResetPlayback();
@@ -268,7 +280,7 @@ class App extends Component {
       this.usage = 'student';
     });
   }
-    
+  
   setUsage(newUsage) {
     this.usage = newUsage;
   }
@@ -334,17 +346,14 @@ class App extends Component {
 
       </Tabs>
 
-      {
-        this.state.showDialog &&
-        <ReactConfirmAlert
-        title="Make a New Fork?"
-        message="You forked this code previously. Do you want to make a fresh fork at this point in the video?"
-        confirmLabel="Yes, Make A New Fork"
-        cancelLabel="No, Use My Existing Fork"
-        onConfirm={ () => { this.hideDialog(); this.newFork(); } }
-        onCancel={  () =>  { this.hideDialog(); this.existingFork(); } }
-        />
-      }
+      <Modal isOpen={this.state.showDialog} contentLabel="Modal" style={modalStyle}  >
+      <h2>Do you want to keep your fork?</h2>
+      <p>You already have a fork of the instructors' code open.</p><p>Do you want to create a new fork, or keep your existing experiment going?</p>
+      <div className="dialogButtons">
+        <Button className="dialogButton" click={ () => {this.hideDialog(); this.newFork(); } } label="Make New Fork" title="Make New Fork" />
+        <Button className="dialogButton" click={ () => {this.hideDialog(); this.existingFork(); } } label="Keep Existing Fork" title="Keep Existing Fork" />
+      </div>
+      </Modal>
 
       </div>
     );

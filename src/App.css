@@ -190,3 +190,26 @@
 .recordStoragePanel li {
   text-align:left !important;
 }
+
+.layout {
+  position:fixed;
+}
+
+.dialogButtons {
+  display:flex;
+}
+
+.dialogButtons span:first-child {
+    margin-left:auto;
+}
+
+.dialogButton {
+  cursor:pointer;
+  font-size:14px;
+  margin-right:10px;
+  border-radius:5px;
+  border:0px;
+  padding:10px;
+  background-color:#66f;
+  color:#fff;
+}

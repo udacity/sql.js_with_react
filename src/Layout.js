@@ -99,6 +99,7 @@ class Layout extends Component {
       storeRecordedPart={this.props.package.functions.storeRecordedPart}      
       getUsage={this.props.package.functions.getUsage}
       />
+
       </div>
       <div className="topRightPanels">
       <PreviewPanel

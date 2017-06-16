@@ -13,6 +13,6 @@ function getParameterByName(name, url) {
 }
 
 ReactDOM.render(
-  <App query={getParameterByName("q")} useHeader={getParameterByName("h")}/>,
+  <App query={getParameterByName("q")} useHeader={getParameterByName("h")} viewId={getParameterByName("viewId")}/>,
   document.getElementById('root')
 );

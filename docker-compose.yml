@@ -14,3 +14,5 @@ services:
       - db
     links:
       - db
+    volumes:
+      - /workspace/history:/opt/sqlwidget

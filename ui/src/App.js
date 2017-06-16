@@ -4,25 +4,54 @@ import SQLOutput from './SQLOutput';
 import SQLText from './SqlText';
 import logo from './udacity_logo.png';
 import axios from 'axios';
+const _ = require('lodash');
 import './App.css';
 import '../node_modules/codemirror/lib/codemirror.css';
 
 class App extends Component {
 
+  /* Props: query, viewId, useHeader
+  */
   constructor(props) {
     super(props);
-
     this.state = {
-      query: props.query || "-- Enter your SQL below, for instance:\nSELECT id, name,website from accounts ORDER BY name ASC;"
+      query: props.query
     }
 
     this.execQuery = this.execQuery.bind(this);
     this.setQuery = this.setQuery.bind(this);
     this.getQuery = this.getQuery.bind(this);
+    this.setHistory = _.debounce(this.setHistory.bind(this), 3000, {maxWait:30000});
+  }
+
+  componentDidMount() {
+    if (this.props.viewId) {
+      this.getHistoricQuery(this.props.viewId);
+    }
+  }
+
+  getHistoricQuery(viewId) {
+    axios.get("/sql/api/history?viewId="+viewId)
+      .then(response => {
+        if (response && response.data && response.data.query !== undefined) {  // allow empty strings which are falsey
+          this.setState({query: response.data.query});
+          return Promise.resolve();
+        } else {
+          return Promise.reject({message:'failed to get historic query'});
+        }
+      });
   }
 
   setQuery(query) {
     this.setState({query: query});
+    this.setHistory();
+  }
+
+  setHistory() {
+    axios.post("/sql/api/history", {
+      query: this.state.query,
+      viewId: this.props.viewId
+    })
   }
 
   getQuery() {
@@ -31,7 +60,8 @@ class App extends Component {
 
   execQuery() {
     axios.post("/sql/api/query", {
-      query: this.state.query
+      query: this.state.query,
+      viewId: this.props.viewId
     }).then(response => {
       if (response.data) {
         this.setState({queryResult: response.data, queryError: undefined});

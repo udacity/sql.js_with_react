@@ -5,10 +5,10 @@ RUN apt-get install nginx -y
 
 RUN npm install -g serve
 
-# Create api and ui directory
+# Create directories
 RUN mkdir -p /root/sqlwidget/api
 RUN mkdir -p /root/sqlwidget/ui
-
+RUN mkdir -p /opt/sqlwidget/
 
 # Install app dependencies
 COPY api/package.json /root/sqlwidget/api

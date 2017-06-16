@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(function(req,res,next) {
     req.db = db;
-    req.query = Promise.promisify(db.query, {context: db});
+    req.querydb = Promise.promisify(db.query, {context: db});
     next();
 });
 

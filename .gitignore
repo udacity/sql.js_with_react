@@ -40,7 +40,7 @@ jspm_packages
 /coverage
 
 # production
-/build
+ui/build
 
 # misc
 .DS_Store
